@@ -1,0 +1,3417 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#09090b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SubZero" />
+  <title>SubZero</title>
+
+  <!-- Inline Monochrome SVG Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2309090b' stroke='%23ffffff' stroke-opacity='0.2'/%3E%3Cpath d='M16 6v20M6 16h20M9 9l14 14M23 9L9 23' stroke='%23fafafa' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!-- Typography: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          },
+          colors: {
+            obsidian: '#09090b',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* ==========================================================================
+       1. DESIGN TOKENS, THEMES & ANIMATED PROPERTIES
+       ========================================================================== */
+    @property --beam-angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    :root,
+    [data-theme="subzero"] {
+      --bg-base: #07090e;
+      --accent-rgb: 56, 189, 248;
+      --accent-2-rgb: 224, 242, 254;
+      --accent-hex: #38bdf8;
+      --accent-2-hex: #e0f2fe;
+      --orb-1: rgba(56, 189, 248, 0.42);
+      --orb-2: rgba(129, 140, 248, 0.34);
+      --orb-3: rgba(14, 165, 233, 0.28);
+      --grid-color: rgba(186, 230, 253, 0.055);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-border-hover: rgba(125, 211, 252, 0.36);
+      --spring: cubic-bezier(0.16, 1, 0.3, 1);
+      --spring-bounce: cubic-bezier(0.34, 1.45, 0.64, 1);
+      --fx-orb-opacity: 0.52;
+      --fx-beam-opacity: 0.72;
+    }
+
+    [data-theme="aurora"] {
+      --bg-base: #040c0e;
+      --accent-rgb: 52, 211, 153;
+      --accent-2-rgb: 34, 211, 238;
+      --accent-hex: #34d399;
+      --accent-2-hex: #22d3ee;
+      --orb-1: rgba(16, 185, 129, 0.42);
+      --orb-2: rgba(6, 182, 212, 0.38);
+      --orb-3: rgba(99, 102, 241, 0.26);
+      --grid-color: rgba(167, 243, 208, 0.055);
+      --glass-border: rgba(167, 243, 208, 0.11);
+      --glass-border-hover: rgba(52, 211, 153, 0.42);
+    }
+
+    [data-theme="cyber"] {
+      --bg-base: #07050c;
+      --accent-rgb: 192, 132, 252;
+      --accent-2-rgb: 244, 114, 182;
+      --accent-hex: #c084fc;
+      --accent-2-hex: #f472b6;
+      --orb-1: rgba(168, 85, 247, 0.45);
+      --orb-2: rgba(236, 72, 153, 0.36);
+      --orb-3: rgba(99, 102, 241, 0.32);
+      --grid-color: rgba(233, 213, 255, 0.055);
+      --glass-border: rgba(233, 213, 255, 0.11);
+      --glass-border-hover: rgba(192, 132, 252, 0.45);
+    }
+
+    [data-theme="ember"] {
+      --bg-base: #0c0706;
+      --accent-rgb: 251, 146, 60;
+      --accent-2-rgb: 251, 191, 36;
+      --accent-hex: #fb923c;
+      --accent-2-hex: #fbbf24;
+      --orb-1: rgba(249, 115, 22, 0.42);
+      --orb-2: rgba(244, 63, 94, 0.3);
+      --orb-3: rgba(245, 158, 11, 0.3);
+      --grid-color: rgba(254, 215, 170, 0.05);
+      --glass-border: rgba(254, 215, 170, 0.11);
+      --glass-border-hover: rgba(251, 146, 60, 0.42);
+    }
+
+    [data-theme="titanium"] {
+      --bg-base: #08080a;
+      --accent-rgb: 244, 244, 245;
+      --accent-2-rgb: 161, 161, 170;
+      --accent-hex: #f4f4f5;
+      --accent-2-hex: #a1a1aa;
+      --orb-1: rgba(255, 255, 255, 0.28);
+      --orb-2: rgba(161, 161, 170, 0.24);
+      --orb-3: rgba(228, 228, 231, 0.18);
+      --grid-color: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-border-hover: rgba(255, 255, 255, 0.36);
+    }
+
+    /* Effekt-Intensitäts-Stufen */
+    [data-fx="normal"] {
+      --fx-orb-opacity: 0.34;
+      --fx-beam-opacity: 0.42;
+    }
+
+    [data-fx="max"] {
+      --fx-orb-opacity: 0.62;
+      --fx-beam-opacity: 0.92;
+    }
+
+    html {
+      color-scheme: dark;
+      background-color: var(--bg-base);
+      scroll-behavior: smooth;
+      transition: background-color 500ms ease;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: #fafafa;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      min-height: 100dvh;
+      transition: background-color 500ms ease;
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Custom Minimal Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(var(--accent-rgb), 0.28);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(var(--accent-rgb), 0.5);
+    }
+
+    /* ==========================================================================
+       2. LIVING AMBIENT STAGE (Aurora Orbs + Sweeping Grid + Particle Canvas + Cursor Aura)
+       ========================================================================== */
+    .ambient-stage {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+      background: var(--bg-base);
+      transition: background 550ms ease;
+    }
+
+    .ambient-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(ellipse 90% 78% at 50% 18%, #000 30%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 78% at 50% 18%, #000 30%, transparent 100%);
+    }
+
+    /* Langsam über das Grid laufende Lichtwelle */
+    .grid-scanner {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 220px;
+      top: -240px;
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(var(--accent-rgb), 0.11) 50%,
+        transparent 100%
+      );
+      animation: gridScan 9s ease-in-out infinite;
+    }
+
+    @keyframes gridScan {
+      0% { transform: translateY(0); opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 0.7; }
+      100% { transform: translateY(130vh); opacity: 0; }
+    }
+
+    .aurora-orb {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(110px);
+      opacity: var(--fx-orb-opacity);
+      will-change: transform;
+      transition: background 650ms ease, opacity 400ms ease;
+    }
+
+    .orb-1 {
+      width: 620px;
+      height: 400px;
+      top: -170px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, var(--orb-1) 0%, transparent 72%);
+      animation: floatOrb1 14s ease-in-out infinite alternate;
+    }
+
+    .orb-2 {
+      width: 500px;
+      height: 500px;
+      top: 18%;
+      right: -170px;
+      background: radial-gradient(circle, var(--orb-2) 0%, transparent 72%);
+      animation: floatOrb2 18s ease-in-out infinite alternate;
+    }
+
+    .orb-3 {
+      width: 540px;
+      height: 440px;
+      bottom: -160px;
+      left: -150px;
+      background: radial-gradient(circle, var(--orb-3) 0%, transparent 72%);
+      animation: floatOrb3 16s ease-in-out infinite alternate;
+    }
+
+    /* Mausverfolgende Hintergrund-Aura */
+    .cursor-aura {
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(var(--accent-rgb), 0.2) 0%, rgba(var(--accent-2-rgb), 0.05) 45%, transparent 70%);
+      filter: blur(55px);
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 400ms ease;
+      will-change: left, top;
+    }
+
+    #fxCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .noise-layer {
+      position: absolute;
+      inset: 0;
+      opacity: 0.036;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    @keyframes floatOrb1 {
+      0% { transform: translate(-54%, 0) scale(1); }
+      100% { transform: translate(-42%, 45px) scale(1.16); }
+    }
+    @keyframes floatOrb2 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-75px, 60px) scale(1.18); }
+    }
+    @keyframes floatOrb3 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(85px, -55px) scale(1.15); }
+    }
+
+    /* ==========================================================================
+       3. LIQUID GLASS SURFACES, 3D TILT, SPOTLIGHT & CONIC BORDER BEAMS
+       ========================================================================== */
+    .glass-card {
+      position: relative;
+      background: linear-gradient(
+        155deg,
+        rgba(255, 255, 255, 0.078) 0%,
+        rgba(var(--accent-rgb), 0.032) 48%,
+        rgba(255, 255, 255, 0.016) 100%
+      );
+      backdrop-filter: blur(26px) saturate(165%);
+      -webkit-backdrop-filter: blur(26px) saturate(165%);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        inset 0 0 28px rgba(var(--accent-rgb), 0.035),
+        0 20px 44px -20px rgba(0, 0, 0, 0.85);
+      transition:
+        transform 260ms var(--spring),
+        border-color 280ms ease,
+        box-shadow 320ms var(--spring),
+        background 320ms ease;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    /* Intensiver Cursor-Spotlight auf der Glasoberfläche */
+    .spotlight::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 280ms ease;
+      background: radial-gradient(
+        460px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(var(--accent-rgb), 0.18),
+        rgba(255, 255, 255, 0.05) 36%,
+        transparent 64%
+      );
+      z-index: 0;
+    }
+
+    /* Leuchtender Specular-Rand entlang der Mausposition */
+    .spotlight::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.5px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 280ms ease;
+      background: radial-gradient(
+        300px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(var(--accent-rgb), 0.85),
+        rgba(var(--accent-2-rgb), 0.4) 35%,
+        transparent 66%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      z-index: 1;
+    }
+
+    .spotlight:hover::before,
+    .spotlight:hover::after {
+      opacity: 1;
+    }
+
+    /* Rotierender Liquid-Light-Beam auf hervorgehobenen Karten */
+    .beam-card .beam-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.5px;
+      pointer-events: none;
+      opacity: var(--fx-beam-opacity);
+      background: conic-gradient(
+        from var(--beam-angle),
+        transparent 0deg,
+        transparent 255deg,
+        rgba(var(--accent-rgb), 0.85) 315deg,
+        rgba(var(--accent-2-rgb), 0.95) 345deg,
+        transparent 360deg
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: rotateBeam 5.5s linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes rotateBeam {
+      to { --beam-angle: 360deg; }
+    }
+
+    .glass-card > *:not(.beam-ring):not(.status-edge) {
+      position: relative;
+      z-index: 2;
+    }
+
+    .glass-lift:hover {
+      border-color: var(--glass-border-hover);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        0 0 36px -12px rgba(var(--accent-rgb), 0.34),
+        0 26px 52px -22px rgba(0, 0, 0, 0.92);
+    }
+
+    /* Status-Glow für Kündigungs-Wecker */
+    .status-amber {
+      border-color: rgba(251, 191, 36, 0.44) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(251, 191, 36, 0.28),
+        0 0 42px -8px rgba(251, 191, 36, 0.38),
+        0 18px 40px -20px rgba(0, 0, 0, 0.85) !important;
+    }
+
+    .status-amber .status-edge {
+      background: linear-gradient(180deg, rgba(251, 191, 36, 0.95), rgba(251, 191, 36, 0.15));
+    }
+
+    .status-red {
+      border-color: rgba(248, 113, 113, 0.52) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(248, 113, 113, 0.34),
+        0 0 48px -8px rgba(248, 113, 113, 0.48),
+        0 18px 40px -20px rgba(0, 0, 0, 0.85) !important;
+      animation: criticalBreath 2.6s ease-in-out infinite;
+    }
+
+    @keyframes criticalBreath {
+      0%, 100% { box-shadow: inset 0 1px 0 rgba(248, 113, 113, 0.3), 0 0 38px -10px rgba(248, 113, 113, 0.38), 0 18px 40px -20px rgba(0, 0, 0, 0.85); }
+      50% { box-shadow: inset 0 1px 0 rgba(248, 113, 113, 0.45), 0 0 56px -6px rgba(248, 113, 113, 0.62), 0 18px 40px -20px rgba(0, 0, 0, 0.85); }
+    }
+
+    .status-red .status-edge {
+      background: linear-gradient(180deg, rgba(248, 113, 113, 1), rgba(248, 113, 113, 0.16));
+    }
+
+    .status-edge {
+      position: absolute !important;
+      left: 0;
+      top: 12%;
+      bottom: 12%;
+      width: 3px;
+      border-radius: 999px;
+      opacity: 0.95;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* Theme-Accent Icon Box */
+    .accent-icon-box {
+      border: 1px solid rgba(var(--accent-rgb), 0.24);
+      background: linear-gradient(145deg, rgba(var(--accent-rgb), 0.16), rgba(255, 255, 255, 0.03));
+      color: var(--accent-2-hex);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 18px -6px rgba(var(--accent-rgb), 0.4);
+      transition: transform 280ms var(--spring-bounce), box-shadow 280ms ease;
+    }
+
+    .glass-card:hover .accent-icon-box {
+      transform: scale(1.07) rotate(-2deg);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 24px -4px rgba(var(--accent-rgb), 0.6);
+    }
+
+    /* ==========================================================================
+       4. INTERACTIVE ELEMENTS, RIPPLE, SHIMMER & SLIDING GLASS PILL
+       ========================================================================== */
+    .btn-glass {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background: rgba(255, 255, 255, 0.05);
+      color: #f4f4f5;
+      font-size: 0.84rem;
+      font-weight: 500;
+      padding: 0.56rem 0.95rem;
+      cursor: pointer;
+      transition: all 240ms var(--spring);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .btn-glass:hover {
+      background: rgba(var(--accent-rgb), 0.14);
+      border-color: rgba(var(--accent-rgb), 0.42);
+      box-shadow: 0 8px 24px -8px rgba(var(--accent-rgb), 0.35);
+      transform: translateY(-1.5px);
+    }
+
+    .btn-glass:active {
+      transform: scale(0.955);
+    }
+
+    .btn-primary-liquid {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      border-radius: 12px;
+      border: 1px solid rgba(var(--accent-2-rgb), 0.85);
+      background: linear-gradient(135deg, #ffffff 0%, var(--accent-2-hex) 45%, var(--accent-hex) 100%);
+      color: #06080d;
+      font-size: 0.84rem;
+      font-weight: 650;
+      padding: 0.58rem 1.08rem;
+      cursor: pointer;
+      box-shadow:
+        0 10px 28px -8px rgba(var(--accent-rgb), 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+      transition: all 260ms var(--spring);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .btn-primary-liquid::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -130%;
+      width: 65%;
+      height: 100%;
+      background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+      transform: skewX(-22deg);
+      transition: left 560ms var(--spring);
+    }
+
+    .btn-primary-liquid:hover {
+      transform: translateY(-2px) scale(1.015);
+      box-shadow:
+        0 16px 34px -8px rgba(var(--accent-rgb), 0.72),
+        inset 0 1px 0 #ffffff;
+    }
+
+    .btn-primary-liquid:hover::after {
+      left: 170%;
+    }
+
+    .btn-primary-liquid:active {
+      transform: scale(0.96);
+    }
+
+    .btn-danger-glass {
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      background: rgba(248, 113, 113, 0.12);
+      color: #fca5a5;
+    }
+    .btn-danger-glass:hover {
+      background: rgba(248, 113, 113, 0.24);
+      border-color: rgba(248, 113, 113, 0.6);
+      box-shadow: 0 8px 24px -8px rgba(248, 113, 113, 0.45);
+      color: #fecaca;
+    }
+
+    .btn-icon {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #a1a1aa;
+      cursor: pointer;
+      transition: all 220ms var(--spring-bounce);
+    }
+
+    .btn-icon:hover {
+      background: rgba(var(--accent-rgb), 0.14);
+      border-color: rgba(var(--accent-rgb), 0.32);
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+
+    .btn-icon:active {
+      transform: scale(0.92);
+    }
+
+    /* Click Ripple Effect */
+    .liquid-ripple {
+      position: absolute;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.65) 0%, rgba(var(--accent-rgb), 0.25) 60%, transparent 100%);
+      transform: translate(-50%, -50%) scale(0);
+      pointer-events: none;
+      animation: rippleOut 580ms var(--spring) forwards;
+    }
+
+    @keyframes rippleOut {
+      to {
+        transform: translate(-50%, -50%) scale(3.2);
+        opacity: 0;
+      }
+    }
+
+    /* Glass Inputs */
+    .glass-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.62rem 0.85rem;
+      font-size: 0.875rem;
+      color: #fafafa;
+      outline: none;
+      transition: all 240ms var(--spring);
+    }
+
+    .glass-input:hover {
+      border-color: rgba(var(--accent-rgb), 0.3);
+      background: rgba(255, 255, 255, 0.065);
+    }
+
+    .glass-input:focus {
+      border-color: rgba(var(--accent-rgb), 0.65);
+      background: rgba(255, 255, 255, 0.085);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.18);
+    }
+
+    select.glass-input option {
+      background-color: #101218;
+      color: #fafafa;
+    }
+
+    /* Sliding Glass Nav Pill */
+    .nav-dock {
+      position: relative;
+      display: flex;
+      padding: 5px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 14px 32px -16px rgba(0, 0, 0, 0.75);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-dock::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-indicator {
+      position: absolute;
+      top: 5px;
+      bottom: 5px;
+      left: 0;
+      border-radius: 13px;
+      background: linear-gradient(
+        145deg,
+        rgba(var(--accent-rgb), 0.28) 0%,
+        rgba(var(--accent-2-rgb), 0.12) 100%
+      );
+      border: 1px solid rgba(var(--accent-rgb), 0.48);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.32),
+        0 0 24px -6px rgba(var(--accent-rgb), 0.55);
+      transition: transform 420ms var(--spring-bounce), width 420ms var(--spring);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .nav-tab-btn {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.68rem 1rem;
+      border-radius: 13px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #a1a1aa;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 240ms ease, transform 200ms var(--spring);
+      background: transparent;
+      border: none;
+    }
+
+    .nav-tab-btn:hover {
+      color: #ffffff;
+    }
+
+    .nav-tab-btn.active {
+      color: #ffffff;
+      text-shadow: 0 0 16px rgba(var(--accent-rgb), 0.55);
+    }
+
+    /* Brand Logo Animation */
+    .brand-crystal {
+      transition: transform 650ms var(--spring-bounce), box-shadow 320ms ease;
+    }
+    .brand-wrap:hover .brand-crystal {
+      transform: rotate(90deg) scale(1.08);
+      box-shadow: 0 0 28px -4px rgba(var(--accent-rgb), 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    /* ==========================================================================
+       5. KINETIC MICRO-ANIMATIONS (Cascade, KPI Flash, Shimmer, Radar, Modals, Settings UI)
+       ========================================================================== */
+    @keyframes cardCascade {
+      0% {
+        opacity: 0;
+        transform: translateY(22px) scale(0.96);
+        filter: blur(6px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    .animate-cascade {
+      animation: cardCascade 520ms var(--spring) backwards;
+      animation-delay: calc(var(--i, 0) * 55ms);
+    }
+
+    @keyframes panelReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.99);
+        filter: blur(6px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    .view-panel {
+      display: none;
+    }
+
+    .view-panel.active {
+      display: block;
+      animation: panelReveal 420ms var(--spring);
+    }
+
+    /* KPI Value Update Flash */
+    @keyframes kpiPop {
+      0% { transform: scale(1); text-shadow: 0 0 0 transparent; }
+      40% { transform: scale(1.06); text-shadow: 0 0 24px rgba(var(--accent-rgb), 0.75); }
+      100% { transform: scale(1); text-shadow: 0 0 0 transparent; }
+    }
+
+    .kpi-pop {
+      animation: kpiPop 480ms var(--spring);
+    }
+
+    /* Liquid Progress Bar Shimmer */
+    .liquid-progress-fill {
+      position: relative;
+      overflow: hidden;
+      transition: width 800ms var(--spring);
+    }
+
+    .liquid-progress-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+      transform: translateX(-100%);
+      animation: liquidShimmer 2.2s ease-in-out infinite;
+    }
+
+    @keyframes liquidShimmer {
+      0% { transform: translateX(-100%); }
+      60%, 100% { transform: translateX(180%); }
+    }
+
+    .theme-progress-gradient {
+      background: linear-gradient(90deg, var(--accent-hex), var(--accent-2-hex));
+      box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.55);
+    }
+
+    /* Radar Pulse Dot for Alerts */
+    .radar-dot {
+      position: relative;
+      width: 7px;
+      height: 7px;
+      border-radius: 9999px;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .radar-dot::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 9999px;
+      border: 1.5px solid currentColor;
+      opacity: 0;
+      animation: radarPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes radarPing {
+      0% { transform: scale(0.7); opacity: 0.95; }
+      85%, 100% { transform: scale(2.4); opacity: 0; }
+    }
+
+    /* Spring Modals with Depth Scale */
+    .app-shell {
+      transition: transform 420ms var(--spring), filter 420ms ease;
+    }
+
+    body.modal-open .app-shell {
+      transform: scale(0.982);
+      filter: blur(4px) brightness(0.82);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      background: rgba(3, 4, 8, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 260ms ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 490px;
+      max-height: 90dvh;
+      overflow-y: auto;
+      border-radius: 24px;
+      background: linear-gradient(
+        160deg,
+        rgba(24, 26, 34, 0.92) 0%,
+        rgba(11, 12, 17, 0.97) 100%
+      );
+      backdrop-filter: blur(30px) saturate(170%);
+      -webkit-backdrop-filter: blur(30px) saturate(170%);
+      border: 1px solid rgba(var(--accent-rgb), 0.28);
+      box-shadow:
+        0 36px 80px -12px rgba(0, 0, 0, 0.94),
+        0 0 48px -18px rgba(var(--accent-rgb), 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      padding: 1.5rem;
+      transform: translateY(26px) scale(0.93);
+      transition: transform 380ms var(--spring-bounce);
+    }
+
+    .modal-overlay.open .modal-sheet {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Settings Theme Swatch Cards */
+    .theme-option {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      padding: 0.75rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.035);
+      text-align: left;
+      cursor: pointer;
+      transition: all 240ms var(--spring);
+    }
+
+    .theme-option:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .theme-option.selected {
+      border-color: rgba(var(--accent-rgb), 0.8);
+      background: rgba(var(--accent-rgb), 0.14);
+      box-shadow: 0 0 24px -8px rgba(var(--accent-rgb), 0.55);
+    }
+
+    /* Custom Liquid Toggle Switch */
+    .liquid-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      cursor: pointer;
+      transition: all 280ms var(--spring);
+      flex-shrink: 0;
+    }
+
+    .liquid-switch::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 9999px;
+      background: #e4e4e7;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+      transition: transform 320ms var(--spring-bounce), background 240ms ease;
+    }
+
+    .liquid-switch[aria-checked="true"] {
+      background: rgba(var(--accent-rgb), 0.35);
+      border-color: rgba(var(--accent-rgb), 0.75);
+      box-shadow: 0 0 16px -4px rgba(var(--accent-rgb), 0.65);
+    }
+
+    .liquid-switch[aria-checked="true"]::after {
+      transform: translateX(20px);
+      background: #ffffff;
+    }
+
+    /* Glass Toast with Progress Line */
+    .toast-item {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.74rem 1.1rem;
+      border-radius: 14px;
+      background: rgba(16, 18, 24, 0.94);
+      backdrop-filter: blur(22px);
+      border: 1px solid rgba(var(--accent-rgb), 0.35);
+      box-shadow: 0 18px 40px -8px rgba(0, 0, 0, 0.85), 0 0 24px -8px rgba(var(--accent-rgb), 0.35);
+      font-size: 0.84rem;
+      color: #fafafa;
+      animation: toastEnter 380ms var(--spring-bounce);
+    }
+
+    .toast-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2.5px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent-hex), var(--accent-2-hex));
+      transform-origin: left;
+      animation: toastCountdown 3s linear forwards;
+    }
+
+    @keyframes toastEnter {
+      0% { opacity: 0; transform: translateY(18px) scale(0.92); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes toastCountdown {
+      from { transform: scaleX(1); }
+      to { transform: scaleX(0); }
+    }
+
+    /* Circular SVG Progress Ring */
+    .ring-progress {
+      transition: stroke-dashoffset 850ms var(--spring);
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+  </style>
+</head>
+<body class="selection:bg-white/20 selection:text-white">
+
+  <!-- Ambient Liquid Background Layer -->
+  <div class="ambient-stage" aria-hidden="true">
+    <div class="aurora-orb orb-1"></div>
+    <div class="aurora-orb orb-2"></div>
+    <div class="aurora-orb orb-3"></div>
+    <div class="ambient-grid"></div>
+    <div class="grid-scanner"></div>
+    <div id="cursorAura" class="cursor-aura"></div>
+    <canvas id="fxCanvas"></canvas>
+    <div class="noise-layer"></div>
+  </div>
+
+  <!-- ========================================================================
+       APP SHELL
+       ======================================================================== -->
+  <div class="app-shell min-h-screen pb-20">
+
+    <!-- Frosted Sticky Header -->
+    <header class="sticky top-0 z-40 border-b border-white/[0.08] bg-black/50 backdrop-blur-2xl">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
+        <div class="brand-wrap flex items-center gap-3 select-none">
+          <div class="brand-crystal accent-icon-box relative grid h-9 w-9 place-items-center rounded-xl">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="2" x2="12" y2="22"></line>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+              <line x1="19.07" y1="4.93" x2="4.93" y2="19.07"></line>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base font-semibold tracking-tight text-white">SubZero</h1>
+              <span class="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-300">
+                <span class="radar-dot !h-1.5 !w-1.5 text-emerald-400"></span>
+                Lokal &amp; Privat
+              </span>
+            </div>
+            <p id="headerSubline" class="text-[11px] text-zinc-400">Konto-, Fixkosten- &amp; Abo-Cockpit</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btnExport" type="button" class="btn-glass !px-3 !py-2 text-xs sm:text-[13px]" title="Daten als JSON-Backup exportieren">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span class="hidden md:inline">JSON-Export</span>
+          </button>
+
+          <button id="btnImport" type="button" class="btn-glass !px-3 !py-2 text-xs sm:text-[13px]" title="JSON-Backup wiederherstellen">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span class="hidden md:inline">JSON-Import</span>
+          </button>
+          <input type="file" id="fileImportInput" accept="application/json,.json" hidden />
+
+          <!-- Einstellungen & Design Button -->
+          <button id="btnSettings" type="button" class="btn-glass !px-3 !py-2 text-xs sm:text-[13px]" title="Einstellungen, Design & Profil">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-500 hover:rotate-90">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span class="hidden sm:inline">Design &amp; Profil</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
+
+      <!-- Personalisierte Begrüßungs-Leiste -->
+      <section class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 id="greetingTitle" class="text-xl font-semibold tracking-tight text-white sm:text-2xl">Willkommen zurück</h2>
+          <p id="greetingSubtitle" class="mt-0.5 text-xs text-zinc-400 sm:text-sm">Deine Finanzen, Verträge und Sparziele auf einen Blick.</p>
+        </div>
+        <button id="btnQuickTheme" type="button" class="btn-glass !rounded-full !px-3.5 !py-1.5 text-xs">
+          <span class="h-2.5 w-2.5 rounded-full" style="background: linear-gradient(135deg, var(--accent-hex), var(--accent-2-hex)); box-shadow: 0 0 10px var(--accent-hex);"></span>
+          <span id="activeThemePill">SubZero Ice</span>
+        </button>
+      </section>
+
+      <!-- Demo-Daten Hinweisbanner -->
+      <div id="demoBanner" hidden class="glass-card spotlight mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-dashed !border-white/15 px-4 py-3 text-xs sm:text-sm text-zinc-300">
+        <div class="flex items-center gap-2.5">
+          <div class="grid h-7 w-7 place-items-center rounded-lg border border-white/10 bg-white/[0.06] text-zinc-200">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </div>
+          <span>Realistische Beispieldaten sind vorgeladen. Du kannst sie anpassen oder mit einem Klick leeren.</span>
+        </div>
+        <button id="btnClearDemo" type="button" class="btn-glass btn-danger-glass !px-3 !py-1.5 text-xs">
+          Beispieldaten löschen
+        </button>
+      </div>
+
+      <!-- ====================================================================
+           KPI BENTO STRIP
+           ==================================================================== -->
+      <section aria-label="Finanz-Kennzahlen" class="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <!-- Gesamtvermögen -->
+        <div class="glass-card glass-lift spotlight tilt-card beam-card animate-cascade rounded-2xl p-4 sm:p-5" style="--i:0">
+          <div class="beam-ring" aria-hidden="true"></div>
+          <div class="mb-3 flex items-center justify-between text-xs font-medium text-zinc-400">
+            <span>Gesamtvermögen</span>
+            <div class="accent-icon-box grid h-8 w-8 place-items-center rounded-lg">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                <line x1="2" y1="10" x2="22" y2="10"></line>
+              </svg>
+            </div>
+          </div>
+          <div id="kpiTotalBalance" class="tabular font-mono text-xl font-semibold tracking-tight text-white sm:text-2xl">0,00 €</div>
+          <div id="kpiAccountCount" class="mt-1 text-[11px] text-zinc-400">0 Konten</div>
+        </div>
+
+        <!-- Monatliche Fixkosten -->
+        <div class="glass-card glass-lift spotlight tilt-card beam-card animate-cascade rounded-2xl p-4 sm:p-5" style="--i:1">
+          <div class="beam-ring" aria-hidden="true"></div>
+          <div class="mb-3 flex items-center justify-between text-xs font-medium text-zinc-400">
+            <span>Fixkosten / Monat</span>
+            <div class="accent-icon-box grid h-8 w-8 place-items-center rounded-lg">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div id="kpiMonthlyCost" class="tabular font-mono text-xl font-semibold tracking-tight text-white sm:text-2xl">0,00 €</div>
+          <div id="kpiSubCount" class="mt-1 text-[11px] text-zinc-400">0 aktive Verträge</div>
+        </div>
+
+        <!-- Jährliche Fixkosten -->
+        <div class="glass-card glass-lift spotlight tilt-card beam-card animate-cascade rounded-2xl p-4 sm:p-5" style="--i:2">
+          <div class="beam-ring" aria-hidden="true"></div>
+          <div class="mb-3 flex items-center justify-between text-xs font-medium text-zinc-400">
+            <span>Fixkosten / Jahr</span>
+            <div class="accent-icon-box grid h-8 w-8 place-items-center rounded-lg">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
+          </div>
+          <div id="kpiYearlyCost" class="tabular font-mono text-xl font-semibold tracking-tight text-white sm:text-2xl">0,00 €</div>
+          <div class="mt-1 text-[11px] text-zinc-400">Jahresbelastung (12 Mon.)</div>
+        </div>
+
+        <!-- Kündigungs-Wecker -->
+        <div id="kpiAlertCard" class="glass-card glass-lift spotlight tilt-card beam-card animate-cascade rounded-2xl p-4 sm:p-5" style="--i:3">
+          <div class="beam-ring" aria-hidden="true"></div>
+          <div class="status-edge hidden" id="kpiAlertEdge"></div>
+          <div class="mb-3 flex items-center justify-between text-xs font-medium text-zinc-400">
+            <span>Kündigungs-Wecker</span>
+            <div id="kpiAlertIconWrap" class="accent-icon-box grid h-8 w-8 place-items-center rounded-lg">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </div>
+          </div>
+          <div id="kpiAlertCount" class="tabular font-mono text-xl font-semibold tracking-tight text-white sm:text-2xl">0</div>
+          <div id="kpiAlertSub" class="mt-1 text-[11px] text-zinc-400">Keine dringenden Fristen</div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SLIDING LIQUID-GLASS NAVIGATION DOCK
+           ==================================================================== -->
+      <nav class="nav-dock mb-6" id="navDock" role="tablist" aria-label="Hauptnavigation">
+        <div class="nav-indicator" id="navIndicator" aria-hidden="true"></div>
+
+        <button class="nav-tab-btn active" data-tab="subs" role="tab" aria-selected="true" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+            <path d="M16 16h5v5"></path>
+          </svg>
+          <span>Abos &amp; Fixkosten</span>
+          <span id="navSubBadge" class="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-[10px] font-semibold tabular">0</span>
+        </button>
+
+        <button class="nav-tab-btn" data-tab="accounts" role="tab" aria-selected="false" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path>
+            <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path>
+          </svg>
+          <span>Konten</span>
+        </button>
+
+        <button class="nav-tab-btn" data-tab="goals" role="tab" aria-selected="false" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <circle cx="12" cy="12" r="2"></circle>
+          </svg>
+          <span>Sparziele</span>
+        </button>
+
+        <button class="nav-tab-btn" data-tab="compare" role="tab" aria-selected="false" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span>Wechsel-Rechner</span>
+        </button>
+      </nav>
+
+      <!-- ====================================================================
+           PANEL 1: ABOS & FIXKOSTEN
+           ==================================================================== -->
+      <section id="panel-subs" class="view-panel active">
+        <!-- Kostenverteilung Mini-Visualisierung -->
+        <div id="categoryBreakdownCard" class="glass-card spotlight mb-5 rounded-2xl p-4 sm:p-5">
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-semibold text-white">Monatliche Kostenverteilung</h2>
+              <p class="text-xs text-zinc-500">Anteile nach Vertragskategorie (normalisiert auf 30 Tage)</p>
+            </div>
+            <span id="breakdownTotalLabel" class="font-mono text-xs font-medium text-zinc-300 tabular">0,00 € / Mon.</span>
+          </div>
+          <div id="categoryBarTrack" class="flex h-2.5 w-full gap-1 overflow-hidden rounded-full bg-white/[0.05] p-0.5"></div>
+          <div id="categoryLegend" class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-zinc-400"></div>
+        </div>
+
+        <!-- Header & Filter-Toolbar -->
+        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-base font-semibold tracking-tight text-white">Laufende Verträge &amp; Abos</h2>
+            <p class="text-xs text-zinc-500">Visueller Wecker bei Fristablauf oder Verlängerung innerhalb von 30 Tagen.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Suchfeld -->
+            <div class="relative flex-1 sm:w-44 sm:flex-none">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="subSearch" type="search" placeholder="Suchen..." class="glass-input !py-2 !pl-8 !pr-3 text-xs" aria-label="Verträge durchsuchen" />
+            </div>
+
+            <select id="subFilterCategory" class="glass-input !w-auto !py-2 text-xs" aria-label="Kategorie filtern">
+              <option value="all">Alle Kategorien</option>
+              <option value="Streaming">Streaming</option>
+              <option value="Mobilfunk">Mobilfunk</option>
+              <option value="Kontoführung">Kontoführung</option>
+              <option value="Software">Software</option>
+              <option value="Versicherung">Versicherung</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Sonstiges">Sonstiges</option>
+            </select>
+
+            <select id="subSortBy" class="glass-input !w-auto !py-2 text-xs" aria-label="Sortierung">
+              <option value="urgency">Dringlichkeit</option>
+              <option value="cost_desc">Kosten (absteigend)</option>
+              <option value="date_asc">Nächste Abbuchung</option>
+              <option value="name_asc">Name (A–Z)</option>
+            </select>
+
+            <button id="btnAddSub" type="button" class="btn-primary-liquid !py-2 text-xs sm:text-[13px]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Vertrag hinzufügen</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="subsList" class="grid grid-cols-1 gap-3.5"></div>
+      </section>
+
+      <!-- ====================================================================
+           PANEL 2: KONTEN & BUDGET
+           ==================================================================== -->
+      <section id="panel-accounts" class="view-panel">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-semibold tracking-tight text-white">Konten &amp; Guthaben</h2>
+            <p class="text-xs text-zinc-500">Verwalte Girokonten, Tagesgeld, Karten und Bargeld an einem Ort.</p>
+          </div>
+          <button id="btnAddAccount" type="button" class="btn-primary-liquid !py-2 text-xs sm:text-[13px]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Konto anlegen</span>
+          </button>
+        </div>
+
+        <div id="accountsList" class="grid grid-cols-1 gap-4 md:grid-cols-2"></div>
+      </section>
+
+      <!-- ====================================================================
+           PANEL 3: SPARZIELE (BUCKETS)
+           ==================================================================== -->
+      <section id="panel-goals" class="view-panel">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-semibold tracking-tight text-white">Sparziele (Buckets)</h2>
+            <p class="text-xs text-zinc-500">Fortschritt für Rücklagen, Notgroschen und geplante Anschaffungen.</p>
+          </div>
+          <button id="btnAddGoal" type="button" class="btn-primary-liquid !py-2 text-xs sm:text-[13px]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Sparziel anlegen</span>
+          </button>
+        </div>
+
+        <div id="goalsList" class="grid grid-cols-1 gap-4 md:grid-cols-2"></div>
+      </section>
+
+      <!-- ====================================================================
+           PANEL 4: WECHSEL- & SPAR-RECHNER
+           ==================================================================== -->
+      <section id="panel-compare" class="view-panel">
+        <div class="mb-4">
+          <h2 class="text-base font-semibold tracking-tight text-white">Wechsel- &amp; Spar-Rechner</h2>
+          <p class="text-xs text-zinc-500">Vergleiche laufende Verträge mit günstigeren Alternativen auf 1 Jahr und 3 Jahre.</p>
+        </div>
+
+        <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <!-- Aktueller Vertrag -->
+          <div class="glass-card spotlight rounded-2xl p-5">
+            <div class="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+              <span>Bisheriger Tarif</span>
+            </div>
+
+            <div class="space-y-3.5">
+              <div>
+                <label for="cmpSelectSub" class="mb-1.5 block text-xs font-medium text-zinc-400">Aus deinen Verträgen laden</label>
+                <select id="cmpSelectSub" class="glass-input">
+                  <option value="">Manuelle Eingabe</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="cmpOldAmount" class="mb-1.5 block text-xs font-medium text-zinc-400">Betrag (€)</label>
+                  <input id="cmpOldAmount" type="number" step="0.01" min="0" value="12.00" class="glass-input tabular font-mono" />
+                </div>
+                <div>
+                  <label for="cmpOldInterval" class="mb-1.5 block text-xs font-medium text-zinc-400">Intervall</label>
+                  <select id="cmpOldInterval" class="glass-input">
+                    <option value="monthly">Monatlich</option>
+                    <option value="quarterly">Vierteljährlich</option>
+                    <option value="yearly">Jährlich</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Neue Alternative -->
+          <div class="glass-card spotlight rounded-2xl p-5">
+            <div class="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-300">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Neuer Tarif / Alternative</span>
+            </div>
+
+            <div class="space-y-3.5">
+              <div>
+                <label for="cmpNewName" class="mb-1.5 block text-xs font-medium text-zinc-400">Name der Alternative</label>
+                <input id="cmpNewName" type="text" value="Kostenloses Direktkonto" placeholder="z. B. Direktbank 0 €" class="glass-input" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="cmpNewAmount" class="mb-1.5 block text-xs font-medium text-zinc-400">Betrag (€)</label>
+                  <input id="cmpNewAmount" type="number" step="0.01" min="0" value="0.00" class="glass-input tabular font-mono" />
+                </div>
+                <div>
+                  <label for="cmpNewInterval" class="mb-1.5 block text-xs font-medium text-zinc-400">Intervall</label>
+                  <select id="cmpNewInterval" class="glass-input">
+                    <option value="monthly">Monatlich</option>
+                    <option value="quarterly">Vierteljährlich</option>
+                    <option value="yearly">Jährlich</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ergebnis-Cockpit -->
+        <div id="compareResultBox" class="glass-card spotlight rounded-2xl p-5 sm:p-6">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 id="cmpHeadline" class="text-base font-semibold text-white">Ersparnis durch Wechsel</h3>
+              <p id="cmpSubline" class="text-xs text-zinc-400">Normalisiert auf monatliche Belastung</p>
+            </div>
+            <button id="btnApplyComparison" type="button" hidden class="btn-primary-liquid !py-2 text-xs">
+              Vertrag direkt umstellen
+            </button>
+          </div>
+
+          <!-- Visueller Balken-Vergleich Alt vs. Neu -->
+          <div class="mb-5 space-y-2.5 rounded-xl border border-white/[0.06] bg-black/25 p-3.5">
+            <div>
+              <div class="mb-1 flex justify-between text-[11px] text-zinc-400">
+                <span>Bisheriger Tarif (pro Monat)</span>
+                <span id="cmpBarOldLabel" class="font-mono tabular text-zinc-300">0,00 €</span>
+              </div>
+              <div class="h-2 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                <div id="cmpBarOld" class="h-full rounded-full bg-zinc-400/70 transition-all duration-500" style="width: 100%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="mb-1 flex justify-between text-[11px] text-zinc-400">
+                <span>Neuer Tarif (pro Monat)</span>
+                <span id="cmpBarNewLabel" class="font-mono tabular text-white">0,00 €</span>
+              </div>
+              <div class="h-2 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                <div id="cmpBarNew" class="liquid-progress-fill h-full rounded-full bg-emerald-400 transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div class="rounded-xl border border-white/[0.07] bg-black/30 p-4">
+              <div class="text-[11px] uppercase tracking-wider text-zinc-500">Pro Monat</div>
+              <div id="cmpDiffMonth" class="mt-1 font-mono text-xl font-semibold tabular">0,00 €</div>
+            </div>
+            <div class="rounded-xl border border-white/[0.07] bg-black/30 p-4">
+              <div class="text-[11px] uppercase tracking-wider text-zinc-500">Auf 1 Jahr</div>
+              <div id="cmpDiff1Y" class="mt-1 font-mono text-xl font-semibold tabular">0,00 €</div>
+            </div>
+            <div class="rounded-xl border border-white/[0.07] bg-black/30 p-4">
+              <div class="text-[11px] uppercase tracking-wider text-zinc-500">Auf 3 Jahre</div>
+              <div id="cmpDiff3Y" class="mt-1 font-mono text-xl font-semibold tabular">0,00 €</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: VERTRAG / ABO
+       ======================================================================== -->
+  <div id="modalSub" class="modal-overlay" aria-hidden="true">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modalSubTitle">
+      <div class="mb-5 flex items-center justify-between">
+        <h3 id="modalSubTitle" class="text-base font-semibold text-white">Vertrag hinzufügen</h3>
+        <button type="button" data-close-modal="modalSub" class="btn-icon" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="formSub" class="space-y-4">
+        <input type="hidden" id="subId" />
+
+        <div>
+          <label for="subName" class="mb-1.5 block text-xs font-medium text-zinc-400">Name des Vertrags / Abos</label>
+          <input id="subName" type="text" required placeholder="z. B. Mobilfunk 5G, Streaming, Hausbank" class="glass-input" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="subCategory" class="mb-1.5 block text-xs font-medium text-zinc-400">Kategorie</label>
+            <select id="subCategory" class="glass-input">
+              <option value="Streaming">Streaming</option>
+              <option value="Mobilfunk">Mobilfunk</option>
+              <option value="Kontoführung">Kontoführung</option>
+              <option value="Software">Software</option>
+              <option value="Versicherung">Versicherung</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Sonstiges">Sonstiges</option>
+            </select>
+          </div>
+          <div>
+            <label for="subAmount" class="mb-1.5 block text-xs font-medium text-zinc-400">Betrag (€)</label>
+            <input id="subAmount" type="number" step="0.01" min="0" required placeholder="9.99" class="glass-input tabular font-mono" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="subInterval" class="mb-1.5 block text-xs font-medium text-zinc-400">Zahlungsintervall</label>
+            <select id="subInterval" class="glass-input">
+              <option value="monthly">Monatlich</option>
+              <option value="quarterly">Vierteljährlich</option>
+              <option value="yearly">Jährlich</option>
+            </select>
+          </div>
+          <div>
+            <label for="subNextDate" class="mb-1.5 block text-xs font-medium text-zinc-400">Nächste Abbuchung</label>
+            <input id="subNextDate" type="date" required class="glass-input" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="subNoticeValue" class="mb-1.5 block text-xs font-medium text-zinc-400">Kündigungsfrist</label>
+            <input id="subNoticeValue" type="number" min="0" max="365" required value="30" class="glass-input tabular font-mono" />
+          </div>
+          <div>
+            <label for="subNoticeUnit" class="mb-1.5 block text-xs font-medium text-zinc-400">Einheit</label>
+            <select id="subNoticeUnit" class="glass-input">
+              <option value="days">Tage</option>
+              <option value="months">Monate</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-2.5 border-t border-white/[0.08] pt-4">
+          <button type="button" data-close-modal="modalSub" class="btn-glass">Abbrechen</button>
+          <button type="submit" class="btn-primary-liquid">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: KONTO
+       ======================================================================== -->
+  <div id="modalAccount" class="modal-overlay" aria-hidden="true">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modalAccountTitle">
+      <div class="mb-5 flex items-center justify-between">
+        <h3 id="modalAccountTitle" class="text-base font-semibold text-white">Konto anlegen</h3>
+        <button type="button" data-close-modal="modalAccount" class="btn-icon" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="formAccount" class="space-y-4">
+        <input type="hidden" id="accountId" />
+
+        <div>
+          <label for="accountName" class="mb-1.5 block text-xs font-medium text-zinc-400">Kontoname</label>
+          <input id="accountName" type="text" required placeholder="z. B. Hauptkonto, Tagesgeld, Kreditkarte" class="glass-input" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="accountType" class="mb-1.5 block text-xs font-medium text-zinc-400">Kontotyp</label>
+            <select id="accountType" class="glass-input">
+              <option value="Girokonto">Girokonto</option>
+              <option value="Sparkonto">Sparkonto</option>
+              <option value="Kreditkarte">Kreditkarte</option>
+              <option value="Depot">Depot</option>
+              <option value="Bargeld">Bargeld</option>
+            </select>
+          </div>
+          <div>
+            <label for="accountBalance" class="mb-1.5 block text-xs font-medium text-zinc-400">Kontostand (€)</label>
+            <input id="accountBalance" type="number" step="0.01" required placeholder="0.00" class="glass-input tabular font-mono" />
+          </div>
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-2.5 border-t border-white/[0.08] pt-4">
+          <button type="button" data-close-modal="modalAccount" class="btn-glass">Abbrechen</button>
+          <button type="submit" class="btn-primary-liquid">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: SPARZIEL (BUCKET)
+       ======================================================================== -->
+  <div id="modalGoal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modalGoalTitle">
+      <div class="mb-5 flex items-center justify-between">
+        <h3 id="modalGoalTitle" class="text-base font-semibold text-white">Sparziel anlegen</h3>
+        <button type="button" data-close-modal="modalGoal" class="btn-icon" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="formGoal" class="space-y-4">
+        <input type="hidden" id="goalId" />
+
+        <div>
+          <label for="goalName" class="mb-1.5 block text-xs font-medium text-zinc-400">Bezeichnung</label>
+          <input id="goalName" type="text" required placeholder="z. B. Notgroschen, Führerschein, Setup-Upgrade" class="glass-input" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="goalCurrent" class="mb-1.5 block text-xs font-medium text-zinc-400">Aktuell gespart (€)</label>
+            <input id="goalCurrent" type="number" step="0.01" min="0" required placeholder="0.00" class="glass-input tabular font-mono" />
+          </div>
+          <div>
+            <label for="goalTarget" class="mb-1.5 block text-xs font-medium text-zinc-400">Zielbetrag (€)</label>
+            <input id="goalTarget" type="number" step="0.01" min="1" required placeholder="1000.00" class="glass-input tabular font-mono" />
+          </div>
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-2.5 border-t border-white/[0.08] pt-4">
+          <button type="button" data-close-modal="modalGoal" class="btn-glass">Abbrechen</button>
+          <button type="submit" class="btn-primary-liquid">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: SCHNELL-BUCHUNG (SPARZIEL / KONTO)
+       ======================================================================== -->
+  <div id="modalDeposit" class="modal-overlay" aria-hidden="true">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modalDepositTitle">
+      <div class="mb-4 flex items-center justify-between">
+        <h3 id="modalDepositTitle" class="text-base font-semibold text-white">Betrag anpassen</h3>
+        <button type="button" data-close-modal="modalDeposit" class="btn-icon" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="formDeposit" class="space-y-4">
+        <input type="hidden" id="depositTargetId" />
+        <input type="hidden" id="depositTargetType" />
+        <p id="depositTargetLabel" class="text-xs text-zinc-400"></p>
+
+        <div>
+          <label for="depositAmount" class="mb-1.5 block text-xs font-medium text-zinc-400">Betrag (€ — negativ für Entnahme)</label>
+          <input id="depositAmount" type="number" step="0.01" required placeholder="50.00" class="glass-input tabular font-mono" />
+        </div>
+
+        <!-- Schnell-Buttons -->
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="btn-glass !px-2.5 !py-1 text-xs quick-delta" data-delta="25">+25 €</button>
+          <button type="button" class="btn-glass !px-2.5 !py-1 text-xs quick-delta" data-delta="50">+50 €</button>
+          <button type="button" class="btn-glass !px-2.5 !py-1 text-xs quick-delta" data-delta="100">+100 €</button>
+          <button type="button" class="btn-glass !px-2.5 !py-1 text-xs quick-delta" data-delta="-50">-50 €</button>
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-2.5 border-t border-white/[0.08] pt-4">
+          <button type="button" data-close-modal="modalDeposit" class="btn-glass">Abbrechen</button>
+          <button type="submit" class="btn-primary-liquid">Buchen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: EINSTELLUNGEN (PROFIL, DESIGN & EFFEKTE)
+       ======================================================================== -->
+  <div id="modalSettings" class="modal-overlay" aria-hidden="true">
+    <div class="modal-sheet !max-w-lg" role="dialog" aria-modal="true" aria-labelledby="modalSettingsTitle">
+      <div class="mb-5 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="accent-icon-box grid h-8 w-8 place-items-center rounded-lg">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="21" x2="4" y2="14"></line>
+              <line x1="4" y1="10" x2="4" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12" y2="3"></line>
+              <line x1="20" y1="21" x2="20" y2="16"></line>
+              <line x1="20" y1="12" x2="20" y2="3"></line>
+              <line x1="1" y1="14" x2="7" y2="14"></line>
+              <line x1="9" y1="8" x2="15" y2="8"></line>
+              <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 id="modalSettingsTitle" class="text-base font-semibold text-white">Einstellungen &amp; Design</h3>
+            <p class="text-[11px] text-zinc-400">Personalisiere Name, Farb-Design und Effekte</p>
+          </div>
+        </div>
+        <button type="button" data-close-modal="modalSettings" class="btn-icon" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="formSettings" class="space-y-5">
+        <!-- Profil / Benutzername -->
+        <div class="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
+          <label for="settingsUserName" class="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-300">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Dein Name</span>
+          </label>
+          <input id="settingsUserName" type="text" maxlength="32" placeholder="z. B. Alex" class="glass-input" />
+          <p class="mt-1.5 text-[11px] text-zinc-500">Wird in deiner persönlichen Begrüßung und im Cockpit-Header angezeigt.</p>
+        </div>
+
+        <!-- Design / Theme Auswahl -->
+        <div>
+          <div class="mb-2.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-300">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="13.5" cy="6.5" r=".5"></circle>
+              <circle cx="17.5" cy="10.5" r=".5"></circle>
+              <circle cx="8.5" cy="7.5" r=".5"></circle>
+              <circle cx="6.5" cy="12.5" r=".5"></circle>
+              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
+            </svg>
+            <span>Liquid-Glass Design</span>
+          </div>
+
+          <div id="themeSelectorGrid" class="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+            <!-- Dynamisch befüllt -->
+          </div>
+        </div>
+
+        <!-- Effekte & Animationen -->
+        <div class="space-y-3 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-300">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>Effekte &amp; Animationen</span>
+          </div>
+
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-xs font-medium text-zinc-200">3D-Karten-Neigung (Tilt)</div>
+              <div class="text-[11px] text-zinc-500">Perspektivische Neigung &amp; Lichtreflexion bei Mausbewegung</div>
+            </div>
+            <button type="button" id="toggleTilt" role="switch" aria-checked="true" class="liquid-switch"></button>
+          </div>
+
+          <div class="flex items-center justify-between gap-3 border-t border-white/[0.06] pt-3">
+            <div>
+              <div class="text-xs font-medium text-zinc-200">Partikel-Netz &amp; Licht-Bursts</div>
+              <div class="text-[11px] text-zinc-500">Interaktive Cryo-Partikel &amp; Effekte beim Speichern</div>
+            </div>
+            <button type="button" id="toggleParticles" role="switch" aria-checked="true" class="liquid-switch"></button>
+          </div>
+
+          <div class="flex items-center justify-between gap-3 border-t border-white/[0.06] pt-3">
+            <div>
+              <div class="text-xs font-medium text-zinc-200">Effekt-Intensität</div>
+              <div class="text-[11px] text-zinc-500">Stärke von Aurora-Glow &amp; rotierenden Licht-Beams</div>
+            </div>
+            <select id="settingsFxLevel" class="glass-input !w-auto !py-1.5 text-xs">
+              <option value="max">Maximal (Hyper-Glass)</option>
+              <option value="normal">Ausgewogen</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 border-t border-white/[0.08] pt-4">
+          <button type="button" data-close-modal="modalSettings" class="btn-glass">Schließen</button>
+          <button type="submit" class="btn-primary-liquid">Einstellungen speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: BESTÄTIGUNGSDIALOG (CUSTOM LIQUID GLASS CONFIRM)
+       ======================================================================== -->
+  <div id="modalConfirm" class="modal-overlay" aria-hidden="true">
+    <div class="modal-sheet !max-w-sm" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+      <div class="mb-3 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-red-400/30 bg-red-500/15 text-red-400">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+          <h3 id="confirmTitle" class="text-base font-semibold text-white">Bestätigen</h3>
+        </div>
+        <button type="button" data-close-modal="modalConfirm" class="btn-icon" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <p id="confirmMessage" class="text-xs leading-relaxed text-zinc-400"></p>
+
+      <div class="mt-6 flex items-center justify-end gap-2.5 border-t border-white/[0.08] pt-4">
+        <button type="button" data-close-modal="modalConfirm" class="btn-glass">Abbrechen</button>
+        <button type="button" id="btnConfirmProceed" class="btn-glass btn-danger-glass font-semibold">Löschen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="pointer-events-none fixed bottom-5 left-4 right-4 z-[200] flex flex-col items-center gap-2 sm:left-auto sm:right-6 sm:items-end" aria-live="polite"></div>
+
+  <!-- ========================================================================
+       APPLICATION ENGINE (Vanilla JS)
+       ======================================================================== -->
+  <script>
+    (() => {
+      'use strict';
+
+      const STORAGE_KEY = 'subzero_liquid_state_v2';
+
+      // Verfügbare Liquid-Glass Designs
+      const THEMES = [
+        { id: 'subzero', name: 'SubZero Ice', desc: 'Eisblau & Obsidian', c1: '#38bdf8', c2: '#e0f2fe', bg: '#07090e' },
+        { id: 'aurora', name: 'Arctic Aurora', desc: 'Smaragd & Cyan', c1: '#34d399', c2: '#22d3ee', bg: '#040c0e' },
+        { id: 'cyber', name: 'Cyber Violet', desc: 'Violett & Neon-Pink', c1: '#c084fc', c2: '#f472b6', bg: '#07050c' },
+        { id: 'ember', name: 'Ember Noir', desc: 'Bernstein & Kupfer', c1: '#fb923c', c2: '#fbbf24', bg: '#0c0706' },
+        { id: 'titanium', name: 'Titanium Mono', desc: 'Flüssiges Chrom', c1: '#f4f4f5', c2: '#a1a1aa', bg: '#08080a' }
+      ];
+
+      const DEFAULT_SETTINGS = {
+        userName: '',
+        theme: 'subzero',
+        fxLevel: 'max',
+        tiltEnabled: true,
+        particlesEnabled: true
+      };
+
+      // Deutsche Währungs- & Datumsformatierung
+      const eurFormatter = new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR'
+      });
+
+      const dateFormatter = new Intl.DateTimeFormat('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+
+      // Zwischenspeicher für animierte Zahlen-Übergänge
+      const animatedValues = new Map();
+      let pendingConfirmCallback = null;
+
+      // ======================================================================
+      // 1. HILFSFUNKTIONEN
+      // ======================================================================
+      function uid() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      }
+
+      function escapeHTML(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      /** Lokales Datum sicher aus YYYY-MM-DD erzeugen (ohne UTC-Verschiebung) */
+      function parseLocalDate(isoStr) {
+        const parts = String(isoStr || '').split('-').map(Number);
+        if (parts.length !== 3 || parts.some(isNaN)) return todayLocal();
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+      }
+
+      function toISODate(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+
+      function todayLocal() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      }
+
+      function addDays(date, days) {
+        const copy = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        copy.setDate(copy.getDate() + days);
+        return copy;
+      }
+
+      function subtractMonths(date, months) {
+        const targetMonth = date.getMonth() - months;
+        const copy = new Date(date.getFullYear(), targetMonth, 1);
+        const maxDay = new Date(copy.getFullYear(), copy.getMonth() + 1, 0).getDate();
+        copy.setDate(Math.min(date.getDate(), maxDay));
+        return copy;
+      }
+
+      function diffDays(fromDate, toDate) {
+        return Math.round((toDate - fromDate) / 86400000);
+      }
+
+      function toMonthlyAmount(amount, interval) {
+        const val = Number(amount) || 0;
+        if (interval === 'quarterly') return val / 3;
+        if (interval === 'yearly') return val / 12;
+        return val;
+      }
+
+      function intervalLabel(interval) {
+        const map = { monthly: 'Monatlich', quarterly: 'Vierteljährlich', yearly: 'Jährlich' };
+        return map[interval] || 'Monatlich';
+      }
+
+      /** Kündigungs-Wecker Status berechnen */
+      function getSubscriptionAlert(sub) {
+        const today = todayLocal();
+        const nextDate = parseLocalDate(sub.nextDate);
+        const noticeVal = Math.max(0, Number(sub.noticeValue) || 0);
+        const deadlineDate = sub.noticeUnit === 'months'
+          ? subtractMonths(nextDate, noticeVal)
+          : addDays(nextDate, -noticeVal);
+
+        const daysToRenewal = diffDays(today, nextDate);
+        const daysToDeadline = diffDays(today, deadlineDate);
+
+        if (daysToDeadline <= 7 && daysToRenewal >= 0) {
+          return {
+            level: 'red',
+            rank: 0,
+            deadlineDate,
+            daysToRenewal,
+            daysToDeadline,
+            label: daysToDeadline < 0
+              ? 'Kündigungsfrist abgelaufen'
+              : daysToDeadline === 0
+                ? 'Frist läuft heute ab'
+                : `Kündigen in ${daysToDeadline} ${daysToDeadline === 1 ? 'Tag' : 'Tagen'}`
+          };
+        }
+
+        if ((daysToDeadline > 7 && daysToDeadline <= 30) || (daysToRenewal >= 0 && daysToRenewal <= 30)) {
+          const label = daysToDeadline <= 30
+            ? `Frist endet in ${daysToDeadline} Tagen`
+            : `Verlängerung in ${daysToRenewal} Tagen`;
+          return {
+            level: 'amber',
+            rank: 1,
+            deadlineDate,
+            daysToRenewal,
+            daysToDeadline,
+            label
+          };
+        }
+
+        return {
+          level: 'ok',
+          rank: 2,
+          deadlineDate,
+          daysToRenewal,
+          daysToDeadline,
+          label: `Frist bis ${dateFormatter.format(deadlineDate)}`
+        };
+      }
+
+      /** Sanfte Zahlen-Interpolation für KPI & Rechner */
+      function animateNumber(el, targetValue, formatterFn) {
+        if (!el) return;
+        const key = el.id;
+        const startValue = animatedValues.has(key) ? animatedValues.get(key) : targetValue;
+        animatedValues.set(key, targetValue);
+
+        if (Math.abs(targetValue - startValue) < 0.005) {
+          el.textContent = formatterFn(targetValue);
+          return;
+        }
+
+        // Kurzer Leucht-Impuls bei Zahlenänderung
+        el.classList.remove('kpi-pop');
+        void el.offsetWidth;
+        el.classList.add('kpi-pop');
+
+        const duration = 520;
+        const startTime = performance.now();
+
+        function step(now) {
+          const progress = Math.min(1, (now - startTime) / duration);
+          const eased = 1 - Math.pow(1 - progress, 4);
+          const current = startValue + (targetValue - startValue) * eased;
+          el.textContent = formatterFn(current);
+          if (progress < 1) requestAnimationFrame(step);
+          else el.textContent = formatterFn(targetValue);
+        }
+        requestAnimationFrame(step);
+      }
+
+      /** Monochrome Lucide-Style SVG Icons */
+      function getCategoryIcon(category) {
+        const icons = {
+          Streaming: '<polygon points="5 3 19 12 5 21 5 3"></polygon>',
+          Mobilfunk: '<rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line>',
+          Kontoführung: '<line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon>',
+          Software: '<polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline>',
+          Versicherung: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>',
+          Fitness: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>',
+          Girokonto: '<rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line>',
+          Sparkonto: '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>',
+          Kreditkarte: '<rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line>',
+          Depot: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>',
+          Bargeld: '<rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path>'
+        };
+        const path = icons[category] || '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>';
+        return `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+      }
+
+      /** Custom Glass Toast Benachrichtigung */
+      function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const el = document.createElement('div');
+        el.className = 'toast-item pointer-events-auto';
+
+        const iconSvg = type === 'error'
+          ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'
+          : '<polyline points="20 6 9 17 4 12"></polyline>';
+
+        const iconColor = type === 'error' ? 'text-red-400' : 'text-emerald-400';
+
+        el.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="${iconColor}">
+            ${iconSvg}
+          </svg>
+          <span>${escapeHTML(message)}</span>
+          <div class="toast-bar"></div>
+        `;
+
+        container.appendChild(el);
+        setTimeout(() => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(10px) scale(0.95)';
+          el.style.transition = '220ms ease';
+          setTimeout(() => el.remove(), 240);
+        }, 3000);
+      }
+
+      /** Custom Liquid Glass Confirm Dialog */
+      function askConfirm(title, message, onConfirm, buttonText = 'Löschen') {
+        document.getElementById('confirmTitle').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+        document.getElementById('btnConfirmProceed').textContent = buttonText;
+        pendingConfirmCallback = onConfirm;
+        openModal('modalConfirm');
+      }
+
+      // ======================================================================
+      // 2. STATE & LOCALSTORAGE
+      // ======================================================================
+      function buildDefaultState() {
+        const today = todayLocal();
+        return {
+          isDemo: true,
+          settings: { ...DEFAULT_SETTINGS },
+          accounts: [
+            { id: uid(), name: 'Hauptkonto', type: 'Girokonto', balance: 2840.50 },
+            { id: uid(), name: 'Tagesgeld-Reserve', type: 'Sparkonto', balance: 5400.00 },
+            { id: uid(), name: 'Kreditkarte', type: 'Kreditkarte', balance: -184.20 },
+            { id: uid(), name: 'ETF-Depot', type: 'Depot', balance: 3150.00 }
+          ],
+          subscriptions: [
+            {
+              id: uid(),
+              name: 'Mobilfunk 5G Tarif',
+              category: 'Mobilfunk',
+              amount: 29.99,
+              interval: 'monthly',
+              nextDate: toISODate(addDays(today, 34)),
+              noticeValue: 1,
+              noticeUnit: 'months'
+            },
+            {
+              id: uid(),
+              name: 'Streaming 4K Abo',
+              category: 'Streaming',
+              amount: 17.99,
+              interval: 'monthly',
+              nextDate: toISODate(addDays(today, 16)),
+              noticeValue: 1,
+              noticeUnit: 'days'
+            },
+            {
+              id: uid(),
+              name: 'Hausbank Kontoführung',
+              category: 'Kontoführung',
+              amount: 36.00,
+              interval: 'quarterly',
+              nextDate: toISODate(addDays(today, 48)),
+              noticeValue: 30,
+              noticeUnit: 'days'
+            },
+            {
+              id: uid(),
+              name: 'Cloud-Speicher 2 TB',
+              category: 'Software',
+              amount: 99.99,
+              interval: 'yearly',
+              nextDate: toISODate(addDays(today, 145)),
+              noticeValue: 14,
+              noticeUnit: 'days'
+            }
+          ],
+          goals: [
+            { id: uid(), name: 'Notgroschen', current: 3800, target: 6000 },
+            { id: uid(), name: 'Setup-Upgrade', current: 950, target: 1500 },
+            { id: uid(), name: 'Führerschein / Mobilität', current: 1350, target: 2500 }
+          ]
+        };
+      }
+
+      let state = loadState();
+
+      function loadState() {
+        try {
+          // Migration aus v1 falls vorhanden
+          const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('subzero_state_v1');
+          if (!raw) {
+            const initial = buildDefaultState();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+            return initial;
+          }
+          const parsed = JSON.parse(raw);
+          return {
+            isDemo: Boolean(parsed.isDemo),
+            settings: { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) },
+            accounts: Array.isArray(parsed.accounts) ? parsed.accounts : [],
+            subscriptions: Array.isArray(parsed.subscriptions) ? parsed.subscriptions : [],
+            goals: Array.isArray(parsed.goals) ? parsed.goals : []
+          };
+        } catch {
+          return buildDefaultState();
+        }
+      }
+
+      function saveState(clearDemoFlag = false) {
+        if (clearDemoFlag) state.isDemo = false;
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch {
+          showToast('Speicherlimit erreicht – bitte JSON-Backup erstellen.', 'error');
+        }
+        applySettings();
+        renderAll();
+      }
+
+      // ======================================================================
+      // 3. INTERAKTIVE EFFEKTE (Canvas Partikel, Bursts, 3D-Tilt, Aura, Ripple)
+      // ======================================================================
+      const fx = {
+        particles: [],
+        bursts: [],
+        mouse: { x: -999, y: -999, active: false },
+        aura: { x: window.innerWidth / 2, y: window.innerHeight / 3 },
+        accentRGB: '56, 189, 248',
+        accent2RGB: '224, 242, 254'
+      };
+
+      function syncThemeColorsToFX() {
+        const styles = getComputedStyle(document.documentElement);
+        fx.accentRGB = styles.getPropertyValue('--accent-rgb').trim() || '56, 189, 248';
+        fx.accent2RGB = styles.getPropertyValue('--accent-2-rgb').trim() || '224, 242, 254';
+      }
+
+      /** Partikel-Burst bei erfolgreichen Aktionen (Speichern, Einzahlen, Design-Wechsel) */
+      function spawnBurst(x = window.innerWidth / 2, y = window.innerHeight / 2, count = 26) {
+        if (!state.settings.particlesEnabled) return;
+        for (let i = 0; i < count; i++) {
+          const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+          const speed = 2.2 + Math.random() * 4.8;
+          fx.bursts.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: 1.6 + Math.random() * 2.4,
+            alpha: 1,
+            decay: 0.018 + Math.random() * 0.018,
+            useAlt: i % 2 === 0
+          });
+        }
+      }
+
+      function initFXEngine() {
+        const canvas = document.getElementById('fxCanvas');
+        const ctx = canvas.getContext('2d');
+        const auraEl = document.getElementById('cursorAura');
+
+        function resizeCanvas() {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.width = window.innerWidth * dpr;
+          canvas.height = window.innerHeight * dpr;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          seedParticles();
+        }
+
+        function seedParticles() {
+          const isMax = state.settings.fxLevel === 'max';
+          const targetCount = Math.min(70, Math.max(24, Math.floor((window.innerWidth * window.innerHeight) / (isMax ? 20000 : 34000))));
+          fx.particles = Array.from({ length: targetCount }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            vx: (Math.random() - 0.5) * 0.48,
+            vy: (Math.random() - 0.5) * 0.48,
+            r: 1.1 + Math.random() * 1.9,
+            alpha: 0.25 + Math.random() * 0.55
+          }));
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+
+        // Spotlight, 3D-Tilt & Cursor-Aura Tracking
+        let activeTiltCard = null;
+
+        document.addEventListener('pointermove', e => {
+          fx.mouse.x = e.clientX;
+          fx.mouse.y = e.clientY;
+          fx.mouse.active = true;
+          if (auraEl) auraEl.style.opacity = state.settings.fxLevel === 'max' ? '0.85' : '0.45';
+
+          const spotCard = e.target.closest('.spotlight');
+          if (spotCard) {
+            const rect = spotCard.getBoundingClientRect();
+            spotCard.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+            spotCard.style.setProperty('--my', `${e.clientY - rect.top}px`);
+          }
+
+          // 3D-Tilt nur für präzise Zeigegeräte (Maus)
+          const tiltCard = e.pointerType === 'mouse' && state.settings.tiltEnabled
+            ? e.target.closest('.tilt-card')
+            : null;
+
+          if (activeTiltCard && activeTiltCard !== tiltCard) {
+            activeTiltCard.style.transform = '';
+            activeTiltCard = null;
+          }
+
+          if (tiltCard) {
+            activeTiltCard = tiltCard;
+            const rect = tiltCard.getBoundingClientRect();
+            const px = (e.clientX - rect.left) / rect.width - 0.5;
+            const py = (e.clientY - rect.top) / rect.height - 0.5;
+            const strength = state.settings.fxLevel === 'max' ? 8 : 4.5;
+            tiltCard.style.transform = `perspective(950px) rotateX(${(-py * strength).toFixed(2)}deg) rotateY(${(px * strength).toFixed(2)}deg) translateY(-3px)`;
+          }
+        }, { passive: true });
+
+        document.addEventListener('pointerleave', () => {
+          fx.mouse.active = false;
+          if (auraEl) auraEl.style.opacity = '0';
+          if (activeTiltCard) {
+            activeTiltCard.style.transform = '';
+            activeTiltCard = null;
+          }
+        });
+
+        // Liquid Ripple bei Klick auf Buttons
+        document.addEventListener('pointerdown', e => {
+          const btn = e.target.closest('.btn-glass, .btn-primary-liquid, .btn-icon');
+          if (!btn) return;
+          const rect = btn.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const ripple = document.createElement('span');
+          ripple.className = 'liquid-ripple';
+          ripple.style.width = `${size}px`;
+          ripple.style.height = `${size}px`;
+          ripple.style.left = `${e.clientX - rect.left}px`;
+          ripple.style.top = `${e.clientY - rect.top}px`;
+          btn.appendChild(ripple);
+          setTimeout(() => ripple.remove(), 600);
+        }, { passive: true });
+
+        // 60fps Render-Loop für Cryo-Partikel, Verbindungs-Linien, Bursts & Cursor-Aura
+        function animateFX() {
+          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+          // Sanfte Nachführung der Hintergrund-Aura
+          if (fx.mouse.active && auraEl) {
+            fx.aura.x += (fx.mouse.x - fx.aura.x) * 0.08;
+            fx.aura.y += (fx.mouse.y - fx.aura.y) * 0.08;
+            auraEl.style.left = `${fx.aura.x}px`;
+            auraEl.style.top = `${fx.aura.y}px`;
+          }
+
+          if (state.settings.particlesEnabled) {
+            const linkDist = state.settings.fxLevel === 'max' ? 135 : 95;
+            const pts = fx.particles;
+
+            for (let i = 0; i < pts.length; i++) {
+              const p = pts[i];
+              p.x += p.vx;
+              p.y += p.vy;
+
+              if (p.x < -10) p.x = window.innerWidth + 10;
+              if (p.x > window.innerWidth + 10) p.x = -10;
+              if (p.y < -10) p.y = window.innerHeight + 10;
+              if (p.y > window.innerHeight + 10) p.y = -10;
+
+              // Maus-Interaktion: leuchtende Verbindungslinien & sanfter Impuls
+              if (fx.mouse.active) {
+                const dx = fx.mouse.x - p.x;
+                const dy = fx.mouse.y - p.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 170) {
+                  const strength = 1 - dist / 170;
+                  ctx.beginPath();
+                  ctx.moveTo(p.x, p.y);
+                  ctx.lineTo(fx.mouse.x, fx.mouse.y);
+                  ctx.strokeStyle = `rgba(${fx.accentRGB}, ${(strength * 0.34).toFixed(3)})`;
+                  ctx.lineWidth = 1;
+                  ctx.stroke();
+                }
+              }
+
+              // Partikel-Verbindungen untereinander
+              for (let j = i + 1; j < pts.length; j++) {
+                const q = pts[j];
+                const dist = Math.hypot(p.x - q.x, p.y - q.y);
+                if (dist < linkDist) {
+                  const alpha = (1 - dist / linkDist) * 0.14;
+                  ctx.beginPath();
+                  ctx.moveTo(p.x, p.y);
+                  ctx.lineTo(q.x, q.y);
+                  ctx.strokeStyle = `rgba(${fx.accentRGB}, ${alpha.toFixed(3)})`;
+                  ctx.lineWidth = 0.8;
+                  ctx.stroke();
+                }
+              }
+
+              // Leuchtender Partikel-Kern
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(${fx.accent2RGB}, ${p.alpha})`;
+              ctx.fill();
+            }
+
+            // Aktive Burst-Partikel animieren
+            for (let i = fx.bursts.length - 1; i >= 0; i--) {
+              const b = fx.bursts[i];
+              b.x += b.vx;
+              b.y += b.vy;
+              b.vx *= 0.96;
+              b.vy *= 0.96;
+              b.alpha -= b.decay;
+
+              if (b.alpha <= 0) {
+                fx.bursts.splice(i, 1);
+                continue;
+              }
+              ctx.beginPath();
+              ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(${b.useAlt ? fx.accent2RGB : fx.accentRGB}, ${b.alpha.toFixed(3)})`;
+              ctx.fill();
+            }
+          }
+
+          requestAnimationFrame(animateFX);
+        }
+
+        requestAnimationFrame(animateFX);
+      }
+
+      /** Einstellungen (Theme, Effekt-Intensität, Name) auf DOM anwenden */
+      function applySettings() {
+        const s = state.settings;
+        document.documentElement.dataset.theme = s.theme || 'subzero';
+        document.documentElement.dataset.fx = s.fxLevel || 'max';
+        syncThemeColorsToFX();
+
+        // Begrüßung nach Tageszeit + Benutzername
+        const hour = new Date().getHours();
+        const salutation = hour < 11 ? 'Guten Morgen' : hour < 17 ? 'Guten Tag' : 'Guten Abend';
+        const cleanName = (s.userName || '').trim();
+
+        document.getElementById('greetingTitle').textContent = cleanName
+          ? `${salutation}, ${cleanName}`
+          : `${salutation} bei SubZero`;
+
+        document.getElementById('headerSubline').textContent = cleanName
+          ? `${cleanName}s Finanz- & Abo-Cockpit`
+          : 'Konto-, Fixkosten- & Abo-Cockpit';
+
+        const activeThemeObj = THEMES.find(t => t.id === s.theme) || THEMES[0];
+        document.getElementById('activeThemePill').textContent = activeThemeObj.name;
+      }
+
+      /** Theme-Auswahlkarten im Einstellungs-Modal rendern */
+      function renderThemeSelector() {
+        const grid = document.getElementById('themeSelectorGrid');
+        const current = state.settings.theme;
+
+        grid.innerHTML = THEMES.map(t => {
+          const isSelected = t.id === current;
+          return `
+            <button type="button" class="theme-option ${isSelected ? 'selected' : ''}" data-pick-theme="${t.id}">
+              <div class="flex w-full items-center justify-between">
+                <div class="h-4 w-12 rounded-full border border-white/15" style="background: linear-gradient(120deg, ${t.bg} 0%, ${t.c1} 60%, ${t.c2} 100%); box-shadow: 0 0 12px -2px ${t.c1};"></div>
+                ${isSelected ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-white"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+              </div>
+              <div>
+                <div class="text-xs font-semibold text-white">${t.name}</div>
+                <div class="text-[10px] text-zinc-400">${t.desc}</div>
+              </div>
+            </button>
+          `;
+        }).join('');
+      }
+
+      function updateNavIndicator() {
+        const dock = document.getElementById('navDock');
+        const indicator = document.getElementById('navIndicator');
+        const activeBtn = dock.querySelector('.nav-tab-btn.active');
+        if (!activeBtn || !indicator) return;
+
+        indicator.style.width = `${activeBtn.offsetWidth}px`;
+        indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+      }
+
+      // ======================================================================
+      // 4. RENDERING ENGINE
+      // ======================================================================
+      function renderAll() {
+        document.getElementById('demoBanner').hidden = !state.isDemo;
+        renderKPIs();
+        renderCategoryBreakdown();
+        renderSubscriptions();
+        renderAccounts();
+        renderGoals();
+        populateCompareDropdown();
+        updateComparison();
+        requestAnimationFrame(updateNavIndicator);
+      }
+
+      function renderKPIs() {
+        const totalBalance = state.accounts.reduce((sum, a) => sum + (Number(a.balance) || 0), 0);
+        animateNumber(document.getElementById('kpiTotalBalance'), totalBalance, v => eurFormatter.format(v));
+        document.getElementById('kpiAccountCount').textContent =
+          `${state.accounts.length} ${state.accounts.length === 1 ? 'Konto' : 'Konten'}`;
+
+        const monthlyTotal = state.subscriptions.reduce(
+          (sum, sub) => sum + toMonthlyAmount(sub.amount, sub.interval), 0
+        );
+        const yearlyTotal = monthlyTotal * 12;
+
+        animateNumber(document.getElementById('kpiMonthlyCost'), monthlyTotal, v => eurFormatter.format(v));
+        animateNumber(document.getElementById('kpiYearlyCost'), yearlyTotal, v => eurFormatter.format(v));
+        document.getElementById('kpiSubCount').textContent =
+          `${state.subscriptions.length} aktive ${state.subscriptions.length === 1 ? 'Vertrag' : 'Verträge'}`;
+
+        // Kündigungs-Wecker KPI
+        const alerts = state.subscriptions.map(getSubscriptionAlert);
+        const redCount = alerts.filter(a => a.level === 'red').length;
+        const amberCount = alerts.filter(a => a.level === 'amber').length;
+        const totalAlerts = redCount + amberCount;
+
+        const alertCard = document.getElementById('kpiAlertCard');
+        const alertEdge = document.getElementById('kpiAlertEdge');
+        const alertIconWrap = document.getElementById('kpiAlertIconWrap');
+        alertCard.classList.remove('status-amber', 'status-red');
+        alertEdge.classList.add('hidden');
+        alertIconWrap.className = 'grid h-7 w-7 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-zinc-300';
+
+        animateNumber(document.getElementById('kpiAlertCount'), totalAlerts, v => String(Math.round(v)));
+        const alertSub = document.getElementById('kpiAlertSub');
+
+        if (redCount > 0) {
+          alertCard.classList.add('status-red');
+          alertEdge.classList.remove('hidden');
+          alertIconWrap.className = 'grid h-7 w-7 place-items-center rounded-lg border border-red-400/30 bg-red-500/15 text-red-400';
+          alertSub.textContent = `${redCount} kritisch, ${amberCount} bald fällig`;
+        } else if (amberCount > 0) {
+          alertCard.classList.add('status-amber');
+          alertEdge.classList.remove('hidden');
+          alertIconWrap.className = 'grid h-7 w-7 place-items-center rounded-lg border border-amber-400/30 bg-amber-500/15 text-amber-400';
+          alertSub.textContent = `${amberCount} in den nächsten 30 Tagen`;
+        } else {
+          alertSub.textContent = 'Keine dringenden Fristen';
+        }
+
+        // Tab Badge
+        const navBadge = document.getElementById('navSubBadge');
+        navBadge.textContent = state.subscriptions.length;
+        navBadge.className = totalAlerts > 0
+          ? 'rounded-full border border-amber-400/35 bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold tabular text-amber-300'
+          : 'rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-[10px] font-semibold tabular text-zinc-300';
+      }
+
+      /** Visuelle Kostenverteilung nach Kategorien (monochrome Glas-Abstufungen) */
+      function renderCategoryBreakdown() {
+        const card = document.getElementById('categoryBreakdownCard');
+        const track = document.getElementById('categoryBarTrack');
+        const legend = document.getElementById('categoryLegend');
+        const totalLabel = document.getElementById('breakdownTotalLabel');
+
+        const totals = {};
+        let grandTotal = 0;
+
+        state.subscriptions.forEach(sub => {
+          const m = toMonthlyAmount(sub.amount, sub.interval);
+          if (m > 0) {
+            totals[sub.category] = (totals[sub.category] || 0) + m;
+            grandTotal += m;
+          }
+        });
+
+        totalLabel.textContent = `${eurFormatter.format(grandTotal)} / Mon.`;
+
+        if (grandTotal <= 0) {
+          card.hidden = true;
+          return;
+        }
+        card.hidden = false;
+
+        // Elegante eisige / monochrome Abstufungen für das Liquid-Glass-Design
+        const shades = [
+          'rgba(255, 255, 255, 0.92)',
+          'rgba(212, 212, 216, 0.72)',
+          'rgba(161, 161, 170, 0.56)',
+          'rgba(125, 211, 252, 0.45)',
+          'rgba(113, 113, 122, 0.5)',
+          'rgba(82, 82, 91, 0.65)',
+          'rgba(63, 63, 70, 0.7)'
+        ];
+
+        const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+
+        track.innerHTML = sorted.map(([cat, val], idx) => {
+          const pct = (val / grandTotal) * 100;
+          const color = shades[idx % shades.length];
+          return `<div title="${escapeHTML(cat)}: ${eurFormatter.format(val)} (${pct.toFixed(0)}%)" class="h-full rounded-full transition-all duration-500" style="width:${pct.toFixed(2)}%; background:${color};"></div>`;
+        }).join('');
+
+        legend.innerHTML = sorted.map(([cat, val], idx) => {
+          const pct = (val / grandTotal) * 100;
+          const color = shades[idx % shades.length];
+          return `
+            <div class="inline-flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full" style="background:${color};"></span>
+              <span class="text-zinc-300">${escapeHTML(cat)}</span>
+              <span class="font-mono text-[11px] text-zinc-500 tabular">${pct.toFixed(0)}%</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderSubscriptions() {
+        const container = document.getElementById('subsList');
+        const filterCat = document.getElementById('subFilterCategory').value;
+        const sortBy = document.getElementById('subSortBy').value;
+        const query = document.getElementById('subSearch').value.trim().toLowerCase();
+
+        let items = state.subscriptions.map(sub => ({
+          sub,
+          alert: getSubscriptionAlert(sub),
+          monthly: toMonthlyAmount(sub.amount, sub.interval)
+        }));
+
+        if (filterCat !== 'all') {
+          items = items.filter(i => i.sub.category === filterCat);
+        }
+        if (query) {
+          items = items.filter(i =>
+            i.sub.name.toLowerCase().includes(query) ||
+            i.sub.category.toLowerCase().includes(query)
+          );
+        }
+
+        items.sort((a, b) => {
+          if (sortBy === 'urgency') return a.alert.rank - b.alert.rank || a.alert.daysToDeadline - b.alert.daysToDeadline;
+          if (sortBy === 'cost_desc') return b.monthly - a.monthly;
+          if (sortBy === 'date_asc') return a.alert.daysToRenewal - b.alert.daysToRenewal;
+          if (sortBy === 'name_asc') return a.sub.name.localeCompare(b.sub.name, 'de');
+          return 0;
+        });
+
+        if (items.length === 0) {
+          container.innerHTML = `
+            <div class="glass-card rounded-2xl px-6 py-12 text-center">
+              <div class="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] text-zinc-400">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <h3 class="text-sm font-semibold text-white">Keine Verträge gefunden</h3>
+              <p class="mx-auto mt-1 max-w-xs text-xs text-zinc-500">Lege einen neuen Vertrag an oder passe deine Filter- und Suchkriterien an.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = items.map(({ sub, alert, monthly }, index) => {
+          const cardStatus = alert.level === 'red' ? 'status-red' : alert.level === 'amber' ? 'status-amber' : '';
+          const edgeEl = alert.level !== 'ok' ? '<div class="status-edge"></div>' : '';
+
+          const badgeClasses = alert.level === 'red'
+            ? 'border-red-400/35 bg-red-500/12 text-red-300'
+            : alert.level === 'amber'
+              ? 'border-amber-400/35 bg-amber-500/12 text-amber-300'
+              : 'border-white/[0.08] bg-white/[0.04] text-zinc-400';
+
+          const radar = alert.level !== 'ok' ? '<span class="radar-dot"></span>' : '';
+          const noticeText = `${sub.noticeValue} ${sub.noticeUnit === 'months' ? (sub.noticeValue == 1 ? 'Monat' : 'Monate') : (sub.noticeValue == 1 ? 'Tag' : 'Tage')}`;
+
+          return `
+            <article class="glass-card glass-lift spotlight tilt-card animate-cascade rounded-2xl p-4 sm:p-5 ${cardStatus}" style="--i:${index}">
+              ${edgeEl}
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex min-w-0 items-center gap-3.5">
+                  <div class="accent-icon-box grid h-11 w-11 shrink-0 place-items-center rounded-xl">
+                    ${getCategoryIcon(sub.category)}
+                  </div>
+                  <div class="min-w-0">
+                    <h3 class="truncate text-[15px] font-semibold tracking-tight text-white">${escapeHTML(sub.name)}</h3>
+                    <div class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-zinc-500">
+                      <span class="text-zinc-400">${escapeHTML(sub.category)}</span>
+                      <span>•</span>
+                      <span>${intervalLabel(sub.interval)}</span>
+                      <span>•</span>
+                      <span>Abbuchung: ${dateFormatter.format(parseLocalDate(sub.nextDate))}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="shrink-0 text-right">
+                  <div class="font-mono text-base font-semibold tracking-tight text-white tabular">${eurFormatter.format(sub.amount)}</div>
+                  <div class="font-mono text-[11px] text-zinc-500 tabular">${eurFormatter.format(monthly)} / Mon.</div>
+                </div>
+              </div>
+
+              <div class="mt-4 flex flex-wrap items-center justify-between gap-2.5 border-t border-white/[0.06] pt-3">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-medium ${badgeClasses}">
+                    ${radar}
+                    <span>${escapeHTML(alert.label)}</span>
+                  </span>
+                  <span class="inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[11px] text-zinc-400">
+                    Frist: ${escapeHTML(noticeText)}
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-1">
+                  <button type="button" data-compare-sub="${sub.id}" class="btn-icon" title="Im Wechsel-Rechner vergleichen">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="20" x2="18" y2="10"></line>
+                      <line x1="12" y1="20" x2="12" y2="4"></line>
+                      <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                  </button>
+                  <button type="button" data-edit-sub="${sub.id}" class="btn-icon" title="Bearbeiten">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button type="button" data-delete-sub="${sub.id}" class="btn-icon hover:!text-red-400" title="Löschen">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      function renderAccounts() {
+        const container = document.getElementById('accountsList');
+        if (state.accounts.length === 0) {
+          container.innerHTML = `
+            <div class="glass-card col-span-full rounded-2xl px-6 py-12 text-center">
+              <div class="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] text-zinc-400">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+              </div>
+              <h3 class="text-sm font-semibold text-white">Noch keine Konten angelegt</h3>
+              <p class="mx-auto mt-1 max-w-xs text-xs text-zinc-500">Erfasse Girokonten, Sparkonten oder Karten für deine automatische Gesamtvermögens-Übersicht.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const positiveTotal = state.accounts.reduce((sum, a) => sum + Math.max(0, Number(a.balance) || 0), 0);
+
+        container.innerHTML = state.accounts.map((acc, index) => {
+          const bal = Number(acc.balance) || 0;
+          const share = positiveTotal > 0 && bal > 0 ? Math.min(100, (bal / positiveTotal) * 100) : 0;
+          const balColor = bal < 0 ? 'text-red-400' : 'text-white';
+
+          return `
+            <article class="glass-card glass-lift spotlight tilt-card animate-cascade flex flex-col justify-between rounded-2xl p-5" style="--i:${index}">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="accent-icon-box grid h-10 w-10 place-items-center rounded-xl">
+                    ${getCategoryIcon(acc.type)}
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-semibold text-white">${escapeHTML(acc.name)}</h3>
+                    <span class="text-xs text-zinc-500">${escapeHTML(acc.type)}</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                  <button type="button" data-adjust-account="${acc.id}" class="btn-glass !rounded-lg !px-2.5 !py-1 text-xs" title="Kontostand schnell anpassen">+/-</button>
+                  <button type="button" data-edit-account="${acc.id}" class="btn-icon" title="Bearbeiten">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button type="button" data-delete-account="${acc.id}" class="btn-icon hover:!text-red-400" title="Löschen">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="my-5 font-mono text-2xl font-semibold tracking-tight tabular ${balColor}">
+                ${eurFormatter.format(bal)}
+              </div>
+
+              <div>
+                <div class="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                  <div class="liquid-progress-fill theme-progress-gradient h-full rounded-full" style="width:${share.toFixed(1)}%"></div>
+                </div>
+                <div class="mt-2 flex items-center justify-between text-[11px] text-zinc-500">
+                  <span>${bal < 0 ? 'Offener Saldo / Verbindlichkeit' : 'Anteil am Gesamtguthaben'}</span>
+                  <span class="font-mono tabular text-zinc-400">${bal < 0 ? '—' : `${share.toFixed(0)} %`}</span>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      function renderGoals() {
+        const container = document.getElementById('goalsList');
+        if (state.goals.length === 0) {
+          container.innerHTML = `
+            <div class="glass-card col-span-full rounded-2xl px-6 py-12 text-center">
+              <div class="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] text-zinc-400">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="6"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                </svg>
+              </div>
+              <h3 class="text-sm font-semibold text-white">Noch keine Sparziele erstellt</h3>
+              <p class="mx-auto mt-1 max-w-xs text-xs text-zinc-500">Definiere Buckets wie Notgroschen, Führerschein oder Setup-Upgrade.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const radius = 17;
+        const circumference = 2 * Math.PI * radius;
+
+        container.innerHTML = state.goals.map((goal, index) => {
+          const current = Math.max(0, Number(goal.current) || 0);
+          const target = Math.max(1, Number(goal.target) || 1);
+          const pct = Math.min(100, (current / target) * 100);
+          const remaining = Math.max(0, target - current);
+          const isDone = current >= target;
+          const dashOffset = circumference - (pct / 100) * circumference;
+
+          return `
+            <article class="glass-card glass-lift spotlight tilt-card animate-cascade rounded-2xl p-5" style="--i:${index}">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3.5">
+                  <!-- Mini Liquid Ring Progress -->
+                  <div class="relative grid h-11 w-11 shrink-0 place-items-center">
+                    <svg width="44" height="44" viewBox="0 0 44 44">
+                      <circle cx="22" cy="22" r="${radius}" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="3"></circle>
+                      <circle cx="22" cy="22" r="${radius}" fill="none" stroke="${isDone ? '#34d399' : 'var(--accent-hex)'}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}" class="ring-progress"></circle>
+                    </svg>
+                    <span class="absolute font-mono text-[10px] font-semibold tabular ${isDone ? 'text-emerald-400' : 'text-zinc-200'}">${Math.round(pct)}%</span>
+                  </div>
+
+                  <div>
+                    <h3 class="text-sm font-semibold text-white">${escapeHTML(goal.name)}</h3>
+                    <p class="mt-0.5 text-xs ${isDone ? 'text-emerald-400' : 'text-zinc-500'}">
+                      ${isDone ? 'Sparziel vollständig erreicht' : `Noch ${eurFormatter.format(remaining)} bis zum Ziel`}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1">
+                  <button type="button" data-deposit-goal="${goal.id}" class="btn-glass !rounded-lg !px-2.5 !py-1 text-xs" title="Einzahlen / Entnehmen">+/-</button>
+                  <button type="button" data-edit-goal="${goal.id}" class="btn-icon" title="Bearbeiten">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button type="button" data-delete-goal="${goal.id}" class="btn-icon hover:!text-red-400" title="Löschen">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-5 mb-2.5 flex items-baseline justify-between">
+                <span class="font-mono text-xl font-semibold text-white tabular">${eurFormatter.format(current)}</span>
+                <span class="font-mono text-xs text-zinc-500 tabular">Ziel: ${eurFormatter.format(target)}</span>
+              </div>
+
+              <div class="h-2 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                <div class="liquid-progress-fill h-full rounded-full ${isDone ? 'bg-gradient-to-r from-emerald-500 to-emerald-300' : 'theme-progress-gradient'}" style="width:${pct.toFixed(1)}%"></div>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      // ======================================================================
+      // 5. WECHSEL- & SPAR-RECHNER
+      // ======================================================================
+      function populateCompareDropdown() {
+        const select = document.getElementById('cmpSelectSub');
+        const currentVal = select.value;
+
+        select.innerHTML = '<option value="">Manuelle Eingabe</option>' +
+          state.subscriptions.map(s =>
+            `<option value="${s.id}">${escapeHTML(s.name)} (${eurFormatter.format(s.amount)} / ${intervalLabel(s.interval)})</option>`
+          ).join('');
+
+        if (state.subscriptions.some(s => s.id === currentVal)) {
+          select.value = currentVal;
+        }
+      }
+
+      function updateComparison() {
+        const oldAmount = parseFloat(document.getElementById('cmpOldAmount').value) || 0;
+        const oldInterval = document.getElementById('cmpOldInterval').value;
+        const newAmount = parseFloat(document.getElementById('cmpNewAmount').value) || 0;
+        const newInterval = document.getElementById('cmpNewInterval').value;
+        const selectedSubId = document.getElementById('cmpSelectSub').value;
+
+        const oldMonthly = toMonthlyAmount(oldAmount, oldInterval);
+        const newMonthly = toMonthlyAmount(newAmount, newInterval);
+        const diffMonth = oldMonthly - newMonthly;
+        const diff1Y = diffMonth * 12;
+        const diff3Y = diffMonth * 36;
+
+        const box = document.getElementById('compareResultBox');
+        const headline = document.getElementById('cmpHeadline');
+        const subline = document.getElementById('cmpSubline');
+        const applyBtn = document.getElementById('btnApplyComparison');
+
+        // Balken-Verhältnis
+        const maxVal = Math.max(oldMonthly, newMonthly, 0.01);
+        document.getElementById('cmpBarOld').style.width = `${(oldMonthly / maxVal) * 100}%`;
+        document.getElementById('cmpBarNew').style.width = `${(newMonthly / maxVal) * 100}%`;
+        document.getElementById('cmpBarOldLabel').textContent = `${eurFormatter.format(oldMonthly)} / Mon.`;
+        document.getElementById('cmpBarNewLabel').textContent = `${eurFormatter.format(newMonthly)} / Mon.`;
+
+        const barNew = document.getElementById('cmpBarNew');
+        const elM = document.getElementById('cmpDiffMonth');
+        const el1 = document.getElementById('cmpDiff1Y');
+        const el3 = document.getElementById('cmpDiff3Y');
+
+        box.style.borderColor = '';
+        box.style.boxShadow = '';
+
+        if (diffMonth > 0.005) {
+          box.style.borderColor = 'rgba(52, 211, 153, 0.32)';
+          box.style.boxShadow = 'inset 0 1px 0 rgba(52, 211, 153, 0.18), 0 0 40px -14px rgba(52, 211, 153, 0.22)';
+          barNew.className = 'liquid-progress-fill h-full rounded-full bg-emerald-400 transition-all duration-500';
+          headline.textContent = 'Ersparnis durch Wechsel';
+          subline.textContent = `Du sparst ${((diffMonth / Math.max(oldMonthly, 0.01)) * 100).toFixed(0)} % gegenüber deinem aktuellen Tarif.`;
+
+          [elM, el1, el3].forEach(el => { el.className = 'mt-1 font-mono text-xl font-semibold tabular text-emerald-400'; });
+          animateNumber(elM, diffMonth, v => `+ ${eurFormatter.format(v)}`);
+          animateNumber(el1, diff1Y, v => `+ ${eurFormatter.format(v)}`);
+          animateNumber(el3, diff3Y, v => `+ ${eurFormatter.format(v)}`);
+        } else if (diffMonth < -0.005) {
+          box.style.borderColor = 'rgba(248, 113, 113, 0.34)';
+          box.style.boxShadow = 'inset 0 1px 0 rgba(248, 113, 113, 0.2), 0 0 40px -14px rgba(248, 113, 113, 0.24)';
+          barNew.className = 'liquid-progress-fill h-full rounded-full bg-red-400 transition-all duration-500';
+          headline.textContent = 'Mehrkosten durch Wechsel';
+          subline.textContent = 'Der neue Tarif ist auf Monatsbasis teurer als dein bisheriger Vertrag.';
+
+          [elM, el1, el3].forEach(el => { el.className = 'mt-1 font-mono text-xl font-semibold tabular text-red-400'; });
+          animateNumber(elM, diffMonth, v => eurFormatter.format(v));
+          animateNumber(el1, diff1Y, v => eurFormatter.format(v));
+          animateNumber(el3, diff3Y, v => eurFormatter.format(v));
+        } else {
+          barNew.className = 'liquid-progress-fill h-full rounded-full bg-zinc-300 transition-all duration-500';
+          headline.textContent = 'Kostenneutral';
+          subline.textContent = 'Beide Tarife verursachen identische monatliche Kosten.';
+
+          [elM, el1, el3].forEach(el => { el.className = 'mt-1 font-mono text-xl font-semibold tabular text-zinc-200'; });
+          animateNumber(elM, 0, v => eurFormatter.format(v));
+          animateNumber(el1, 0, v => eurFormatter.format(v));
+          animateNumber(el3, 0, v => eurFormatter.format(v));
+        }
+
+        applyBtn.hidden = !selectedSubId;
+      }
+
+      // ======================================================================
+      // 6. MODAL- & TAB-STEUERUNG
+      // ======================================================================
+      function openModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+        const firstInput = modal.querySelector('input:not([type="hidden"]), select');
+        if (firstInput) setTimeout(() => firstInput.focus(), 80);
+      }
+
+      function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        if (!document.querySelector('.modal-overlay.open')) {
+          document.body.classList.remove('modal-open');
+        }
+      }
+
+      function switchTab(tabName) {
+        document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+          const active = btn.dataset.tab === tabName;
+          btn.classList.toggle('active', active);
+          btn.setAttribute('aria-selected', String(active));
+        });
+        document.querySelectorAll('.view-panel').forEach(panel => {
+          panel.classList.toggle('active', panel.id === `panel-${tabName}`);
+        });
+        updateNavIndicator();
+      }
+
+      // ======================================================================
+      // 7. EVENT-BINDINGS
+      // ======================================================================
+      function bindEvents() {
+        // Navigation Tabs
+        document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        window.addEventListener('resize', updateNavIndicator, { passive: true });
+
+        // --- EINSTELLUNGEN MODAL ---
+        function openSettingsModal() {
+          document.getElementById('settingsUserName').value = state.settings.userName || '';
+          document.getElementById('settingsFxLevel').value = state.settings.fxLevel || 'max';
+          document.getElementById('toggleTilt').setAttribute('aria-checked', String(state.settings.tiltEnabled));
+          document.getElementById('toggleParticles').setAttribute('aria-checked', String(state.settings.particlesEnabled));
+          renderThemeSelector();
+          openModal('modalSettings');
+        }
+
+        document.getElementById('btnSettings').addEventListener('click', openSettingsModal);
+        document.getElementById('btnQuickTheme').addEventListener('click', openSettingsModal);
+
+        // Live Theme Preview beim Klick auf Design-Karten
+        document.getElementById('themeSelectorGrid').addEventListener('click', e => {
+          const btn = e.target.closest('[data-pick-theme]');
+          if (!btn) return;
+          state.settings.theme = btn.dataset.pickTheme;
+          applySettings();
+          renderThemeSelector();
+          const rect = btn.getBoundingClientRect();
+          spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 22);
+        });
+
+        // Toggle Switches in Einstellungen
+        document.getElementById('toggleTilt').addEventListener('click', e => {
+          const next = e.currentTarget.getAttribute('aria-checked') !== 'true';
+          e.currentTarget.setAttribute('aria-checked', String(next));
+          state.settings.tiltEnabled = next;
+        });
+
+        document.getElementById('toggleParticles').addEventListener('click', e => {
+          const next = e.currentTarget.getAttribute('aria-checked') !== 'true';
+          e.currentTarget.setAttribute('aria-checked', String(next));
+          state.settings.particlesEnabled = next;
+        });
+
+        document.getElementById('settingsFxLevel').addEventListener('change', e => {
+          state.settings.fxLevel = e.target.value;
+          applySettings();
+        });
+
+        document.getElementById('formSettings').addEventListener('submit', e => {
+          e.preventDefault();
+          state.settings.userName = document.getElementById('settingsUserName').value.trim();
+          state.settings.fxLevel = document.getElementById('settingsFxLevel').value;
+          closeModal('modalSettings');
+          saveState();
+          spawnBurst(window.innerWidth / 2, 120, 30);
+          showToast('Einstellungen & Design gespeichert');
+        });
+
+        // Modals schließen
+        document.querySelectorAll('[data-close-modal]').forEach(btn => {
+          btn.addEventListener('click', () => closeModal(btn.dataset.closeModal));
+        });
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+          overlay.addEventListener('click', e => {
+            if (e.target === overlay) closeModal(overlay.id);
+          });
+        });
+        document.addEventListener('keydown', e => {
+          if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
+          }
+        });
+
+        // Custom Confirm Proceed
+        document.getElementById('btnConfirmProceed').addEventListener('click', () => {
+          const cb = pendingConfirmCallback;
+          pendingConfirmCallback = null;
+          closeModal('modalConfirm');
+          if (typeof cb === 'function') cb();
+        });
+
+        // Beispieldaten löschen
+        document.getElementById('btnClearDemo').addEventListener('click', () => {
+          askConfirm(
+            'Beispieldaten entfernen?',
+            'Alle vorgeladenen Konten, Verträge und Sparziele werden geleert, damit du frisch starten kannst.',
+            () => {
+              state = { isDemo: false, settings: state.settings, accounts: [], subscriptions: [], goals: [] };
+              saveState();
+              showToast('Beispieldaten wurden entfernt');
+            },
+            'Alle leeren'
+          );
+        });
+
+        // Filter, Suche & Sortierung
+        document.getElementById('subFilterCategory').addEventListener('change', renderSubscriptions);
+        document.getElementById('subSortBy').addEventListener('change', renderSubscriptions);
+        document.getElementById('subSearch').addEventListener('input', renderSubscriptions);
+
+        // --- ABO CRUD ---
+        document.getElementById('btnAddSub').addEventListener('click', () => {
+          document.getElementById('formSub').reset();
+          document.getElementById('subId').value = '';
+          document.getElementById('subNextDate').value = toISODate(addDays(todayLocal(), 30));
+          document.getElementById('modalSubTitle').textContent = 'Vertrag hinzufügen';
+          openModal('modalSub');
+        });
+
+        document.getElementById('formSub').addEventListener('submit', e => {
+          e.preventDefault();
+          const id = document.getElementById('subId').value;
+          const payload = {
+            id: id || uid(),
+            name: document.getElementById('subName').value.trim(),
+            category: document.getElementById('subCategory').value,
+            amount: parseFloat(document.getElementById('subAmount').value) || 0,
+            interval: document.getElementById('subInterval').value,
+            nextDate: document.getElementById('subNextDate').value,
+            noticeValue: parseInt(document.getElementById('subNoticeValue').value, 10) || 0,
+            noticeUnit: document.getElementById('subNoticeUnit').value
+          };
+
+          if (id) {
+            const idx = state.subscriptions.findIndex(s => s.id === id);
+            if (idx !== -1) state.subscriptions[idx] = payload;
+            showToast('Vertrag aktualisiert');
+          } else {
+            state.subscriptions.push(payload);
+            showToast('Vertrag hinzugefügt');
+          }
+
+          closeModal('modalSub');
+          saveState(true);
+          spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 24);
+        });
+
+        // --- KONTO CRUD ---
+        document.getElementById('btnAddAccount').addEventListener('click', () => {
+          document.getElementById('formAccount').reset();
+          document.getElementById('accountId').value = '';
+          document.getElementById('modalAccountTitle').textContent = 'Konto anlegen';
+          openModal('modalAccount');
+        });
+
+        document.getElementById('formAccount').addEventListener('submit', e => {
+          e.preventDefault();
+          const id = document.getElementById('accountId').value;
+          const payload = {
+            id: id || uid(),
+            name: document.getElementById('accountName').value.trim(),
+            type: document.getElementById('accountType').value,
+            balance: parseFloat(document.getElementById('accountBalance').value) || 0
+          };
+
+          if (id) {
+            const idx = state.accounts.findIndex(a => a.id === id);
+            if (idx !== -1) state.accounts[idx] = payload;
+            showToast('Konto aktualisiert');
+          } else {
+            state.accounts.push(payload);
+            showToast('Konto angelegt');
+          }
+
+          closeModal('modalAccount');
+          saveState(true);
+          spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 24);
+        });
+
+        // --- SPARZIEL CRUD ---
+        document.getElementById('btnAddGoal').addEventListener('click', () => {
+          document.getElementById('formGoal').reset();
+          document.getElementById('goalId').value = '';
+          document.getElementById('modalGoalTitle').textContent = 'Sparziel anlegen';
+          openModal('modalGoal');
+        });
+
+        document.getElementById('formGoal').addEventListener('submit', e => {
+          e.preventDefault();
+          const id = document.getElementById('goalId').value;
+          const payload = {
+            id: id || uid(),
+            name: document.getElementById('goalName').value.trim(),
+            current: Math.max(0, parseFloat(document.getElementById('goalCurrent').value) || 0),
+            target: Math.max(1, parseFloat(document.getElementById('goalTarget').value) || 1)
+          };
+
+          if (id) {
+            const idx = state.goals.findIndex(g => g.id === id);
+            if (idx !== -1) state.goals[idx] = payload;
+            showToast('Sparziel aktualisiert');
+          } else {
+            state.goals.push(payload);
+            showToast('Sparziel angelegt');
+          }
+
+          closeModal('modalGoal');
+          saveState(true);
+          spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 24);
+        });
+
+        // --- SCHNELL-BUCHUNG (+/-) ---
+        document.querySelectorAll('.quick-delta').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const input = document.getElementById('depositAmount');
+            const current = parseFloat(input.value) || 0;
+            input.value = (current + parseFloat(btn.dataset.delta)).toFixed(2);
+          });
+        });
+
+        document.getElementById('formDeposit').addEventListener('submit', e => {
+          e.preventDefault();
+          const id = document.getElementById('depositTargetId').value;
+          const type = document.getElementById('depositTargetType').value;
+          const delta = parseFloat(document.getElementById('depositAmount').value) || 0;
+
+          if (type === 'goal') {
+            const goal = state.goals.find(g => g.id === id);
+            if (goal) {
+              goal.current = Math.max(0, Number(goal.current) + delta);
+              closeModal('modalDeposit');
+              saveState(true);
+              spawnBurst(window.innerWidth / 2, window.innerHeight / 2, goal.current >= goal.target ? 48 : 24);
+              showToast(`Sparziel „${goal.name}“ angepasst`);
+            }
+          } else if (type === 'account') {
+            const acc = state.accounts.find(a => a.id === id);
+            if (acc) {
+              acc.balance = Number(acc.balance) + delta;
+              closeModal('modalDeposit');
+              saveState(true);
+              spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 20);
+              showToast(`Kontostand „${acc.name}“ aktualisiert`);
+            }
+          }
+        });
+
+        // --- EVENT DELEGATION: VERTRÄGE ---
+        document.getElementById('subsList').addEventListener('click', e => {
+          const btn = e.target.closest('button');
+          if (!btn) return;
+
+          if (btn.dataset.editSub) {
+            const sub = state.subscriptions.find(s => s.id === btn.dataset.editSub);
+            if (!sub) return;
+            document.getElementById('subId').value = sub.id;
+            document.getElementById('subName').value = sub.name;
+            document.getElementById('subCategory').value = sub.category;
+            document.getElementById('subAmount').value = sub.amount;
+            document.getElementById('subInterval').value = sub.interval;
+            document.getElementById('subNextDate').value = sub.nextDate;
+            document.getElementById('subNoticeValue').value = sub.noticeValue;
+            document.getElementById('subNoticeUnit').value = sub.noticeUnit;
+            document.getElementById('modalSubTitle').textContent = 'Vertrag bearbeiten';
+            openModal('modalSub');
+          } else if (btn.dataset.deleteSub) {
+            const sub = state.subscriptions.find(s => s.id === btn.dataset.deleteSub);
+            if (!sub) return;
+            askConfirm(
+              'Vertrag löschen?',
+              `Möchtest du „${sub.name}“ dauerhaft aus deiner Fixkosten-Übersicht entfernen?`,
+              () => {
+                state.subscriptions = state.subscriptions.filter(s => s.id !== sub.id);
+                saveState(true);
+                showToast('Vertrag gelöscht');
+              }
+            );
+          } else if (btn.dataset.compareSub) {
+            const sub = state.subscriptions.find(s => s.id === btn.dataset.compareSub);
+            if (!sub) return;
+            document.getElementById('cmpSelectSub').value = sub.id;
+            document.getElementById('cmpOldAmount').value = sub.amount;
+            document.getElementById('cmpOldInterval').value = sub.interval;
+            document.getElementById('cmpNewName').value = `${sub.name} (Alternative)`;
+            updateComparison();
+            switchTab('compare');
+          }
+        });
+
+        // --- EVENT DELEGATION: KONTEN ---
+        document.getElementById('accountsList').addEventListener('click', e => {
+          const btn = e.target.closest('button');
+          if (!btn) return;
+
+          if (btn.dataset.editAccount) {
+            const acc = state.accounts.find(a => a.id === btn.dataset.editAccount);
+            if (!acc) return;
+            document.getElementById('accountId').value = acc.id;
+            document.getElementById('accountName').value = acc.name;
+            document.getElementById('accountType').value = acc.type;
+            document.getElementById('accountBalance').value = acc.balance;
+            document.getElementById('modalAccountTitle').textContent = 'Konto bearbeiten';
+            openModal('modalAccount');
+          } else if (btn.dataset.adjustAccount) {
+            const acc = state.accounts.find(a => a.id === btn.dataset.adjustAccount);
+            if (!acc) return;
+            document.getElementById('depositTargetId').value = acc.id;
+            document.getElementById('depositTargetType').value = 'account';
+            document.getElementById('modalDepositTitle').textContent = 'Kontostand anpassen';
+            document.getElementById('depositTargetLabel').textContent =
+              `${acc.name} — aktueller Stand: ${eurFormatter.format(acc.balance)}`;
+            document.getElementById('depositAmount').value = '';
+            openModal('modalDeposit');
+          } else if (btn.dataset.deleteAccount) {
+            const acc = state.accounts.find(a => a.id === btn.dataset.deleteAccount);
+            if (!acc) return;
+            askConfirm(
+              'Konto löschen?',
+              `Möchtest du das Konto „${acc.name}“ wirklich entfernen?`,
+              () => {
+                state.accounts = state.accounts.filter(a => a.id !== acc.id);
+                saveState(true);
+                showToast('Konto gelöscht');
+              }
+            );
+          }
+        });
+
+        // --- EVENT DELEGATION: SPARZIELE ---
+        document.getElementById('goalsList').addEventListener('click', e => {
+          const btn = e.target.closest('button');
+          if (!btn) return;
+
+          if (btn.dataset.editGoal) {
+            const goal = state.goals.find(g => g.id === btn.dataset.editGoal);
+            if (!goal) return;
+            document.getElementById('goalId').value = goal.id;
+            document.getElementById('goalName').value = goal.name;
+            document.getElementById('goalCurrent').value = goal.current;
+            document.getElementById('goalTarget').value = goal.target;
+            document.getElementById('modalGoalTitle').textContent = 'Sparziel bearbeiten';
+            openModal('modalGoal');
+          } else if (btn.dataset.depositGoal) {
+            const goal = state.goals.find(g => g.id === btn.dataset.depositGoal);
+            if (!goal) return;
+            document.getElementById('depositTargetId').value = goal.id;
+            document.getElementById('depositTargetType').value = 'goal';
+            document.getElementById('modalDepositTitle').textContent = 'Sparziel anpassen';
+            document.getElementById('depositTargetLabel').textContent =
+              `${goal.name} — aktuell gespart: ${eurFormatter.format(goal.current)} von ${eurFormatter.format(goal.target)}`;
+            document.getElementById('depositAmount').value = '';
+            openModal('modalDeposit');
+          } else if (btn.dataset.deleteGoal) {
+            const goal = state.goals.find(g => g.id === btn.dataset.deleteGoal);
+            if (!goal) return;
+            askConfirm(
+              'Sparziel löschen?',
+              `Möchtest du das Sparziel „${goal.name}“ wirklich entfernen?`,
+              () => {
+                state.goals = state.goals.filter(g => g.id !== goal.id);
+                saveState(true);
+                showToast('Sparziel gelöscht');
+              }
+            );
+          }
+        });
+
+        // --- WECHSEL-RECHNER ---
+        document.getElementById('cmpSelectSub').addEventListener('change', e => {
+          const sub = state.subscriptions.find(s => s.id === e.target.value);
+          if (sub) {
+            document.getElementById('cmpOldAmount').value = sub.amount;
+            document.getElementById('cmpOldInterval').value = sub.interval;
+          }
+          updateComparison();
+        });
+
+        ['cmpOldAmount', 'cmpOldInterval', 'cmpNewAmount', 'cmpNewInterval'].forEach(id => {
+          document.getElementById(id).addEventListener('input', updateComparison);
+          document.getElementById(id).addEventListener('change', updateComparison);
+        });
+
+        document.getElementById('btnApplyComparison').addEventListener('click', () => {
+          const subId = document.getElementById('cmpSelectSub').value;
+          const sub = state.subscriptions.find(s => s.id === subId);
+          if (!sub) return;
+
+          const newName = document.getElementById('cmpNewName').value.trim();
+          const newAmount = parseFloat(document.getElementById('cmpNewAmount').value) || 0;
+          const newInterval = document.getElementById('cmpNewInterval').value;
+
+          if (newName) sub.name = newName;
+          sub.amount = newAmount;
+          sub.interval = newInterval;
+
+          saveState(true);
+          spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 36);
+          showToast('Vertrag erfolgreich auf neuen Tarif umgestellt');
+          switchTab('subs');
+        });
+
+        // --- JSON EXPORT & IMPORT ---
+        document.getElementById('btnExport').addEventListener('click', () => {
+          const exportPayload = {
+            app: 'SubZero',
+            version: 3,
+            exportedAt: new Date().toISOString(),
+            data: {
+              settings: state.settings,
+              accounts: state.accounts,
+              subscriptions: state.subscriptions,
+              goals: state.goals
+            }
+          };
+          const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `subzero-backup-${toISODate(todayLocal())}.json`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          showToast('JSON-Backup heruntergeladen');
+        });
+
+        const fileInput = document.getElementById('fileImportInput');
+        document.getElementById('btnImport').addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', e => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const parsed = JSON.parse(String(reader.result));
+              const source = parsed.data || parsed;
+              if (!Array.isArray(source.accounts) || !Array.isArray(source.subscriptions) || !Array.isArray(source.goals)) {
+                throw new Error('Ungültiges Format');
+              }
+              state = {
+                isDemo: false,
+                settings: { ...DEFAULT_SETTINGS, ...(source.settings || {}) },
+                accounts: source.accounts,
+                subscriptions: source.subscriptions,
+                goals: source.goals
+              };
+              saveState();
+              spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 32);
+              showToast('Backup erfolgreich wiederhergestellt');
+            } catch {
+              showToast('Ungültige Backup-Datei – bitte eine SubZero-JSON wählen.', 'error');
+            } finally {
+              fileInput.value = '';
+            }
+          };
+          reader.readAsText(file);
+        });
+      }
+
+      // ======================================================================
+      // 8. INITIALISIERUNG
+      // ======================================================================
+      window.addEventListener('DOMContentLoaded', () => {
+        applySettings();
+        initFXEngine();
+        bindEvents();
+        renderAll();
+        // Sicherstellen, dass der Glass-Slider nach Font-Load exakt sitzt
+        setTimeout(updateNavIndicator, 120);
+      });
+    })();
+  </script>
+</body>
+</html>
