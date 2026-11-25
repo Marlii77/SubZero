@@ -12,7 +12,7 @@
 
 <br />
 
-> **Live-Demo:** `[https://<dein-benutzername>.github.io/<dein-repo-name>/](https://marlii77.github.io/SubZero/)`  
+> **Live-Demo:** `https://marlii77.github.io/SubZero/`  
 > *(Passe den Link oben nach dem Aktivieren von GitHub Pages an.)*
 
 </div>
